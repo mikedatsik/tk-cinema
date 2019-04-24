@@ -30,10 +30,10 @@ class SceneOperation(HookClass):
 
     # def set_content_directory(self, file_path):
     #     """
-    #     Set Clarisse Project Content's directory preference $CDIR
+    #     Set Cinema Project Content's directory preference $CDIR
 
     #     :param file_path:       String
-    #                             The full path to the clarisse project
+    #                             The full path to the cinema project
     #     """
     #     content_dir = os.path.join(os.path.dirname(file_path), "Content")
     #     preferences = ix.application.get_prefs()

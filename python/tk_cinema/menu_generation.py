@@ -9,7 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 """
-Menu handling for Clarisse
+Menu handling for Cinema
 
 """
 
@@ -30,7 +30,7 @@ __contact__ = "https://www.linkedin.com/in/mykhailo-datsyk/"
 
 class MenuGenerator(object):
     """
-    Menu generation functionality for Clarisse
+    Menu generation functionality for Cinema
     """
 
     def __init__(self, engine, menu_handle):
@@ -332,7 +332,7 @@ class MenuGenerator(object):
 #             (exc_type, exc_value, exc_traceback) = sys.exc_info()
 #             message = (
 #                 "Message: Shotgun encountered a problem excutin an action from"
-#                 " the Clarisse engine"
+#                 " the Cinema engine"
 #             )
 #             message += "Exception: %s - %s\n" % (exc_type, exc_value)
 #             message += "Traceback (most recent call last):\n"

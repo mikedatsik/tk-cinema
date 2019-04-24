@@ -35,9 +35,9 @@ def get_contexts(context, result=None):
 
 class BreakdownSceneOperations(Hook):
     """
-    Breakdown operations for Clarisse.
+    Breakdown operations for Cinema.
 
-    This implementation handles detection of clarisse file geometric, 
+    This implementation handles detection of cinema file geometric, 
     alembic, usd and texture nodes.
     """
 

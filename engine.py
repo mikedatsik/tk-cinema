@@ -98,7 +98,7 @@ class SceneEventWatcher(object):
     Encapsulates event handling for multiple scene events and routes them
     into a single callback.
 
-    This uses monkey patching some of the functions in the clarisse application
+    This uses monkey patching some of the functions in the cinema application
 
     Specifying run_once=True in the constructor causes all events to be
     cleaned up after the first one has triggered
@@ -145,20 +145,20 @@ class SceneEventWatcher(object):
         #         # report warning...
         #         continue
 
-        # create a callback that will be run when Clarisse
+        # create a callback that will be run when Cinema
         # exits so we can do some clean-up:
         # event_fn = getattr(ix.application, SCENE_QUIT_EVENT_NAME)
         # event_fn = wrapped(
         #     event_fn,
         #     self,
-        #     pre_callback=SceneEventWatcher.__clarisse_exiting_callback,
+        #     pre_callback=SceneEventWatcher.__cinema_exiting_callback,
         # )
         # self.__wrapped_fns[SCENE_QUIT_EVENT_NAME] = event_fn
         # setattr(ix.application, SCENE_QUIT_EVENT_NAME, event_fn)
 
     def stop_watching(self):
         """
-        Stops watching the Clarisse scene.
+        Stops watching the Cinema scene.
         """
         # for event_name, event_fn in self.__wrapped_fns.iteritems():
         #     setattr(ix.application, event_name, event_fn._original)
@@ -174,9 +174,9 @@ class SceneEventWatcher(object):
         watcher.__cb_fn()
 
     @staticmethod
-    def __clarisse_exiting_callback(watcher):
+    def __cinema_exiting_callback(watcher):
         """
-        Called on Clarisse exit - should clean up any existing calbacks
+        Called on Cinema exit - should clean up any existing calbacks
         """
         watcher.stop_watching()
 
@@ -603,7 +603,7 @@ class CinemaEngine(Engine):
             self._initialize_dark_look_and_feel()
             qt_app.aboutToQuit.connect(qt_app.deleteLater)
 
-        # import pyqt_clarisse
+        # import pyqt_cinema
         # qt_app.show()
 
     def post_app_init(self):

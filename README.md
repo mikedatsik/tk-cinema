@@ -1,18 +1,18 @@
-# Clarisse Shotgun toolkit engine
+# Cinema 4D Shotgun toolkit engine
 
-Contact : [Diego Garcia Huerta](https://www.linkedin.com/in/diegogh/)
+Cinema 4D Shotgun toolkit base on [Diego Garcia Huerta](https://www.linkedin.com/in/diegogh/) Clarisse Shotgun toolkit.
 
-![tk-clarisse_screenshot01](config/images/tk-clarisse_screenshot01.PNG)
+![tk-cinema_screenshot01](config/images/tk-cinema_screenshot01.PNG)
 
 ## Overview
 
-Implementation of a shotgun toolkit engine for [**Clarise iFX**](https://www.isotropix.com/products/clarisse/ifx). This engine is based on the [tk-maya engine](https://github.com/shotgunsoftware/tk-maya) heavily adapted to Clarisse. It supports the classic boostrap startup methodology and integrates with clarisse adding a shotgun menu in it's menu bar.
+Implementation of a shotgun toolkit engine for [**Cinema 4D**](https://www.isotropix.com/products/cinema/ifx). This engine is based on the [tk-maya engine](https://github.com/shotgunsoftware/tk-maya) heavily adapted to Cinema 4D. It supports the classic boostrap startup methodology and integrates with cinema adding a shotgun menu in it's menu bar.
 
 * [Engine Installation](#engine-installation)
 * [Configuring your project for Shotgun Toolkit](#configuring-your-project-for-shotgun-toolkit)
 * [Modifying the toolkit configuration files to add this engine and related apps](#modifying-the-toolkit-configuration-files-to-add-this-engine-and-related-apps)
 * [Modifying the Templates](#modifying-the-templates)
-* [Configuring Clarisse in the software launcher](#configuring-clarisse-in-the-software-launcher)
+* [Configuring Cinema 4D in the software launcher](#configuring-cinema-in-the-software-launcher)
 * [Caching and downloading the engine into disk](#caching-and-downloading-the-engine-into-disk)
 
 With the engine, hooks for most of the standard tk application are provided:
@@ -24,9 +24,9 @@ With the engine, hooks for most of the standard tk application are provided:
 * [tk-multi-breakdown](#tk-multi-breakdown)
 * [tk-multi-setframerange](#tk-multi-setframerange) ( see notes below as this is a fork from the original shotgun repository to allow having hooks per engine, as the original one has support only for certain applications)
 
-(I've also included a hook that allows to take a [thumbnail](hooks/thumbnail.py) of clarisse window, useful for configuring tk-multi-snapshot for example.)
+(I've also included a hook that allows to take a [thumbnail](hooks/thumbnail.py) of cinema window, useful for configuring tk-multi-snapshot for example.)
 
-**Note: This engine has been tested in Windows using Clarisse iFX version 3.6, and Clarisse iFX version 4.0 Learning Edition (just released at the time of writting)**
+**Note: This engine has been tested in Windows using Cinema 4D version 20**
 
 
 ## Engine Installation
@@ -112,30 +112,30 @@ and add the following changes from this file:
 [engine_locations.yml](config/env/includes/engine_locations.yml)
 
 ```yaml
-# Clarisse
-engines.tk-clarisse.location:
+# Cinema 4D
+engines.tk-cinema.location:
   type: git
   branch: master
-  path: https://github.com/diegogarciahuerta/tk-clarisse.git
+  path: https://github.com/diegogarciahuerta/tk-cinema.git
   version: v1.0.0
 ```
 
-Or in your environments you should add tk-clarisse yml file, for example in the asset_step yml file:
+Or in your environments you should add tk-cinema yml file, for example in the asset_step yml file:
 ``/configs/game_config/env/asset_step.yml``
 
 Let's add the include at the beginning of the file, in the 'includes' section:
 ```yaml
-- ./includes/settings/tk-clarisse.yml
+- ./includes/settings/tk-cinema.yml
 ```
 
-Now we add a new entry under the engines section, that will include all the information for our clarisse application:
+Now we add a new entry under the engines section, that will include all the information for our cinema application:
 ```yaml
-  tk-clarisse: "@settings.tk-clarisse.asset_step"
+  tk-cinema: "@settings.tk-cinema.asset_step"
 ```
 
 And so on.
 
-Finally, do not forget to copy the additional `tk-clarisse.yml` into your settings folder.
+Finally, do not forget to copy the additional `tk-cinema.yml` into your settings folder.
 
 
 ## Modifying the Templates
@@ -145,19 +145,19 @@ The additions to `config/core/templates.yml` are provided also under the config 
 [templates.yml](config/core/templates.yml)
 
 
-## Configuring Clarisse in the software launcher
+## Configuring Cinema 4D in the software launcher
 
-In order for Clarisse to show up in the shotgun launcher, we need to add it to our list of softwares that are valid for this project.
+In order for Cinema 4D to show up in the shotgun launcher, we need to add it to our list of softwares that are valid for this project.
 
 * Navigate to your shotgun url, ie. `example.shotgunstudio.com`, and once logged in, clink in the Shotgun Settings menu, the arrow at the top right of the webpage, close to your user picture. 
 * Click in the Software menu
 
   ![software_entity](config/images/software_entity.png)
 
-* We will create a new entry for Clarisse, called "Clarisse". The description was conveniently copied and pasted from Wikipedia.
+* We will create a new entry for Cinema 4D, called "Cinema 4D". The description was conveniently copied and pasted from Wikipedia.
 ![create_new_software](config/images/create_new_software.png)
 
-* We should now specify the engine this software will use. "tk-clarisse"
+* We should now specify the engine this software will use. "tk-cinema"
 ![software_specify_engine](config/images/software_specify_engine.png)
 
 * Note that you can restrict this application to certain projects by specifying the project under the projects column. If no projects are specified this application will show up for all the projects that have this engine in their configuration files.
@@ -179,11 +179,11 @@ One last step is to cache the engine and apps from the configuration files into 
 ![tank_cache_apps](config/images/tank_cache_apps.png)
 
 
-## Clarisse engine should be ready to use
+## Cinema 4D engine should be ready to use
 
-If we now go back and forth from our project in shotgun desktop ( < arrow top left if you are already within a project ), we should be able to see Clarisse as an application to launch.
+If we now go back and forth from our project in shotgun desktop ( < arrow top left if you are already within a project ), we should be able to see Cinema 4D as an application to launch.
 
-![clarisse_is_configured.png](config/images/clarisse_is_configured.png)
+![cinema_is_configured.png](config/images/cinema_is_configured.png)
 
 
 ## [tk-multi-workfiles2](https://support.shotgunsoftware.com/hc/en-us/articles/219033088)
@@ -197,21 +197,21 @@ A Shotgun Snapshot is a quick incremental backup that lets you version and manag
 Hooks are provided to be able to use this tk-app, similar to workfiles2.
 
 ## [tk-multi-loader2](https://support.shotgunsoftware.com/hc/en-us/articles/219033078)
-![tk-clarisse_screenshot01](config/images/tk-clarisse_screenshot01.PNG)
+![tk-cinema_screenshot01](config/images/tk-cinema_screenshot01.PNG)
 
 The Shotgun Loader lets you quickly overview and browse the files that you have published to Shotgun. A searchable tree view navigation system makes it easy to quickly get to the task, shot or asset that you are looking for and once there the loader shows a thumbnail based overview of all the publishes for that item. Through configurable hooks you can then easily reference or import a publish into your current scene.
 
-The hooks provided support all the input reference and import formats from Clarisse, from alembic files, usd files (Clarisse iFX v4.0+), lwo, obj, Clarisse project files, etc...
+The hooks provided support all the input reference and import formats from Cinema 4D, from alembic files, usd files (Cinema 4D iFX v4.0+), lwo, obj, Cinema 4D project files, etc...
 
 ## [tk-multi-publish2](https://support.shotgunsoftware.com/hc/en-us/articles/115000097513)
-![tk-clarisse_screenshot03](config/images/tk-clarisse_screenshot03.PNG)
+![tk-cinema_screenshot03](config/images/tk-cinema_screenshot03.PNG)
 
 The Publish app allows artists to publish their work so that it can be used by artists downstream. It supports traditional publishing workflows within the artist’s content creation software as well as stand-alone publishing of any file on disk. When working in content creation software and using the basic Shotgun integration, the app will automatically discover and display items for the artist to publish. For more sophisticated production needs, studios can write custom publish plugins to drive artist workflows.
 
 Only the basic publishing of the current session is provided with this app. 
 
 ## [tk-multi-breakdown](https://support.shotgunsoftware.com/hc/en-us/articles/219032988)
-![tk-clarisse_screenshot02](config/images/tk-clarisse_screenshot02.PNG)
+
 
 The Scene Breakdown App shows you a list of items you have loaded (referenced) in your scene and tells you which ones are out of date. From this overview, you can select multiple objects and click the update button which will update all your selected items to use the latest published version.
 
@@ -242,7 +242,7 @@ The location section for this app should look like:
         version: b24a977
 ```
 where version represents the commit id. (at the time of writting the latest commit)
-(note that the hook for clarisse is however included with the tk-clarisse engine)
+(note that the hook for cinema is however included with the tk-cinema engine)
 
 For completion, I've kept the original README from shotgun, that include very valuable links:
 
