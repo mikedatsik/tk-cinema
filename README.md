@@ -211,7 +211,7 @@ The Shotgun Loader lets you quickly overview and browse the files that you have 
 The hooks provided support all the input reference and import formats from Cinema 4D, from alembic files, usd files (Cinema 4D iFX v4.0+), lwo, obj, Cinema 4D project files, etc...
 
 ## [tk-multi-publish2](https://support.shotgunsoftware.com/hc/en-us/articles/115000097513)
-![tk-cinema_screenshot03](config/images/tk-cinema_screenshot03.PNG)
+![tk-cinema_screenshot03](config/images/tk-cinema_screenshot05.PNG)
 
 The Publish app allows artists to publish their work so that it can be used by artists downstream. It supports traditional publishing workflows within the artist’s content creation software as well as stand-alone publishing of any file on disk. When working in content creation software and using the basic Shotgun integration, the app will automatically discover and display items for the artist to publish. For more sophisticated production needs, studios can write custom publish plugins to drive artist workflows.
 
