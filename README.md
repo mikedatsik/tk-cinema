@@ -1,6 +1,13 @@
 # Cinema 4D Shotgun toolkit engine
 
 Cinema 4D Shotgun toolkit base on [Diego Garcia Huerta](https://www.linkedin.com/in/diegogh/) Clarisse Shotgun toolkit.
+Developing in progress...
+
+## TODO:
+* Publish components hooks
+* Load components hooks
+* Breakdown
+* Fix Stuck background progress issue
 
 ![tk-cinema_screenshot01](config/images/tk-cinema_screenshot01.PNG)
 
