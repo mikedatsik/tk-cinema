@@ -6,7 +6,7 @@ Cinema 4D Shotgun toolkit base on [Diego Garcia Huerta](https://www.linkedin.com
 
 ## Overview
 
-Implementation of a shotgun toolkit engine for [**Cinema 4D**](https://www.isotropix.com/products/cinema/ifx). This engine is based on the [tk-maya engine](https://github.com/shotgunsoftware/tk-maya) heavily adapted to Cinema 4D. It supports the classic boostrap startup methodology and integrates with cinema adding a shotgun menu in it's menu bar.
+Implementation of a shotgun toolkit engine for [**Cinema 4D**](https://www.maxon.net). This engine is based on the [tk-maya engine](https://github.com/shotgunsoftware/tk-maya) heavily adapted to Cinema 4D. It supports the classic boostrap startup methodology and integrates with cinema adding a shotgun menu in it's menu bar.
 
 * [Engine Installation](#engine-installation)
 * [Configuring your project for Shotgun Toolkit](#configuring-your-project-for-shotgun-toolkit)
