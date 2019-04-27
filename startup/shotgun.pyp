@@ -4,6 +4,7 @@
 import os
 import sys
 import c4d
+import signal
 import hashlib
 
 import sgtk
@@ -130,7 +131,9 @@ def EnhanceMainMenu():
 def PluginMessage(id, data):
     if id==c4d.C4DPL_BUILDMENU:
         EnhanceMainMenu()
-
+    if id==c4d.C4DPL_ENDPROGRAM:
+        # Close Cinema Solution after PySide executes
+        os.kill(os.getpid(), signal.SIGTERM)
 
 def register_plugins():
     for item in menu_prebuild:

@@ -214,9 +214,15 @@ class CinemaActions(HookBaseClass):
         if not os.path.exists(path):
             raise TankError("File not found on disk - '%s'" % path)
 
-        # with disabled_updates():
-        #     context = ix.get_current_context()
-        #     ix.reference_file(context, path)
+        namespace = "%s %s" % (sg_publish_data.get("entity").get("name"), sg_publish_data.get("name"))
+        namespace = namespace.replace(" ", "_")
+        
+        doc = c4d.documents.GetActiveDocument()
+        
+        xref = c4d.BaseObject(c4d.Oxref)
+        doc.InsertObject(xref)
+        xref.SetParameter(c4d.ID_CA_XREF_FILE, path, c4d.DESCFLAGS_SET_USERINTERACTION)
+        xref.SetName(namespace)
 
     def _do_import(self, path, sg_publish_data):
         """
@@ -235,7 +241,7 @@ class CinemaActions(HookBaseClass):
         image_extensions = (".jpg", ".exr")
 
         import_scene_extensions = (".lws", ".abc")
-        import_geometry_extensions = (".lwo", ".obj")
+        import_geometry_extensions = (".abc", ".obj")
         import_volume_extensions = (".vdb",)
         import_project_extensions = (".c4d",)
 
@@ -244,7 +250,7 @@ class CinemaActions(HookBaseClass):
         if extension.lower() in import_project_extensions:
             c4d.documents.MergeDocument(doc, path, 0)
             c4d.EventAdd()
-        # with disabled_updates():
+
         #     if extension.lower() in import_scene_extensions:
         #         ix.api.IOHelpers.import_scene(ix.application, path)
         #     elif extension.lower() in image_extensions:
@@ -254,7 +260,7 @@ class CinemaActions(HookBaseClass):
         #     elif extension.lower() in import_volume_extensions:
         #         ix.import_volume(path)
 
-    def _create_texture_node(self, path, sg_publish_data, stream=False):
+    def _create_texture_node(self, path, sg_publish_data):
         """
         Create a file texture node for a texture
         
@@ -263,16 +269,12 @@ class CinemaActions(HookBaseClass):
                                  publish fields.
         :returns:                The newly created file node
         """
-        image_extensions = ix.api.ImageIOFileFormat.get_supported_extensions()
-        image_extensions = [
-            ".%s".lower() % image_extension
-            for image_extension in image_extensions
-        ]
 
-        _, extension = os.path.splitext(path)
-        if extension.lower() in image_extensions:
-            with disabled_updates():
-                if not stream:
-                    ix.import_map_file(path, "TextureMapFile", "_map")
-                else:
-                    ix.import_map_file(path, "TextureStreamedMapFile", "_smap")
+        doc = c4d.documents.GetActiveDocument()
+        
+        file_node = c4d.BaseList2D(c4d.Xbitmap)
+        file_node[c4d.BITMAPSHADER_FILENAME] = path
+        doc.InsertShader(file_node)
+        c4d.EventAdd()
+        
+        return file_node

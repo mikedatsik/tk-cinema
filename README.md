@@ -6,8 +6,9 @@ Developing in progress...
 ## TODO:
 * Publish components hooks
 * Load components hooks
+  * Add Node material load and texture
 * Breakdown
-* Fix Stuck background progress issue
+* Make more intuitive menu build instead of hard
 
 ![tk-cinema_screenshot01](config/images/tk-cinema_screenshot01.PNG)
 

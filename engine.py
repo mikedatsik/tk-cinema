@@ -522,7 +522,7 @@ class CinemaEngine(Engine):
             if show_warning_dlg:
                 # Note, title is padded to try to ensure dialog isn't insanely
                 # narrow!
-                show_info(msg)
+                display_info(msg)
 
             # always log the warning to the script editor:
             self.logger.warning(msg)
