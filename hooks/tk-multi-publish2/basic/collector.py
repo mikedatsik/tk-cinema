@@ -77,9 +77,14 @@ class CinemaSessionCollector(HookBaseClass):
         :param parent_item: Root item instance
 
         """
-
         # create an item representing the current cinema session
+        doc = c4d.documents.GetActiveDocument()
         item = self.collect_current_cinema_session(settings, parent_item)
+        project_root = doc.GetDocumentPath()
+
+        self.collect_playblasts(item, project_root)
+        self.collect_alembic_caches(item, project_root)
+        self._collect_session_cameras(item)
 
     def collect_current_cinema_session(self, settings, parent_item):
         """
@@ -142,3 +147,132 @@ class CinemaSessionCollector(HookBaseClass):
         self.logger.info("Collected current Cinema scene")
 
         return session_item
+
+    def _collect_session_cameras(self, parent_item):
+        """
+        Creates items for each camera to be exported.
+
+        :param parent_item:
+        :return:
+        """
+
+        # get the icon path to display for camera items
+        icon_path = os.path.join(
+            self.disk_location,
+            os.pardir,
+            "icons",
+            "camera.png"
+        )
+
+        doc = c4d.documents.GetActiveDocument()
+        
+        for camera_shape in doc.GetObjects():
+            if camera_shape.GetType() == 5103:
+                # try to determine the camera display name
+                camera_name = camera_shape.GetName()
+
+                cam_item = parent_item.create_item(
+                    "cinema.session.camera",
+                    "Camera",
+                    camera_name
+                )
+
+                cam_item.set_icon_from_path(icon_path)
+
+                # store the camera name so that any attached plugin knows which
+                # camera this item represents!
+                cam_item.properties["camera_name"] = camera_name
+                cam_item.properties["camera_shape"] = camera_shape
+
+                self.logger.debug("Collected cemera:" + camera_name)
+
+    def collect_playblasts(self, parent_item, project_root):
+        """
+        Creates items for quicktime playblasts.
+
+        Looks for a 'project_root' property on the parent item, and if such
+        exists, look for movie files in a 'movies' subfolder.
+
+        :param parent_item: Parent Item instance
+        :param str project_root: The maya project root to search for playblasts
+        """
+
+        # ensure the movies dir exists
+        movies_dir = os.path.join(project_root, "movies")
+        if not os.path.exists(movies_dir):
+            return
+
+        self.logger.info(
+            "Processing movies folder: %s" % (movies_dir,),
+            extra={
+                "action_show_folder": {
+                    "path": movies_dir
+                }
+            }
+        )
+
+        # look for movie files in the movies folder
+        for filename in os.listdir(movies_dir):
+
+            # do some early pre-processing to ensure the file is of the right
+            # type. use the base class item info method to see what the item
+            # type would be.
+            item_info = self._get_item_info(filename)
+            if item_info["item_type"] != "file.video":
+                continue
+
+            movie_path = os.path.join(movies_dir, filename)
+
+            # allow the base class to collect and create the item. it knows how
+            # to handle movie files
+            item = super(CinemaSessionCollector, self)._collect_file(
+                parent_item,
+                movie_path
+            )
+
+            # the item has been created. update the display name to include
+            # the an indication of what it is and why it was collected
+            item.name = "%s (%s)" % (item.name, "playblast")
+
+    def collect_alembic_caches(self, parent_item, project_root):
+        """
+        Creates items for alembic caches
+
+        Looks for a 'project_root' property on the parent item, and if such
+        exists, look for alembic caches in a 'cache/alembic' subfolder.
+
+        :param parent_item: Parent Item instance
+        :param str project_root: The maya project root to search for alembics
+        """
+
+        # ensure the alembic cache dir exists
+        cache_dir = os.path.join(project_root, "cache", "alembic")
+        if not os.path.exists(cache_dir):
+            return
+
+        self.logger.info(
+            "Processing alembic cache folder: %s" % (cache_dir,),
+            extra={
+                "action_show_folder": {
+                    "path": cache_dir
+                }
+            }
+        )
+
+        # look for alembic files in the cache folder
+        for filename in os.listdir(cache_dir):
+            cache_path = os.path.join(cache_dir, filename)
+
+            # do some early pre-processing to ensure the file is of the right
+            # type. use the base class item info method to see what the item
+            # type would be.
+            item_info = self._get_item_info(filename)
+            if item_info["item_type"] != "file.alembic":
+                continue
+
+            # allow the base class to collect and create the item. it knows how
+            # to handle alembic files
+            super(CinemaSessionCollector, self)._collect_file(
+                parent_item,
+                cache_path
+            )
