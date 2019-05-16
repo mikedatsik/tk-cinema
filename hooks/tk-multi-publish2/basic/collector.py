@@ -85,6 +85,7 @@ class CinemaSessionCollector(HookBaseClass):
         self.collect_playblasts(item, project_root)
         self.collect_alembic_caches(item, project_root)
         self._collect_session_cameras(item)
+        self.collect_rendered_images(item)
 
     def collect_current_cinema_session(self, settings, parent_item):
         """
@@ -183,6 +184,7 @@ class CinemaSessionCollector(HookBaseClass):
                 # camera this item represents!
                 cam_item.properties["camera_name"] = camera_name
                 cam_item.properties["camera_shape"] = camera_shape
+                cam_item.properties["publish_type"] = "Camera"
 
                 self.logger.debug("Collected cemera:" + camera_name)
 
@@ -276,3 +278,41 @@ class CinemaSessionCollector(HookBaseClass):
                 parent_item,
                 cache_path
             )
+
+    def collect_rendered_images(self, parent_item):
+        """
+        Creates items for any rendered images that can be identified by
+        render layers in the file.
+        :param parent_item: Parent Item instance
+        :return:
+        """
+
+        # iterate over defined render layers and query the render settings for
+        # information about a potential render
+        for layer in cmds.ls(type="renderLayer"):
+
+            self.logger.info("Processing render layer: %s" % (layer,))
+
+            # use the render settings api to get a path where the frame number
+            # spec is replaced with a '*' which we can use to glob
+            (frame_glob,) = cmds.renderSettings(
+                genericFrameImageName="*",
+                fullPath=True,
+                layer=layer
+            )
+
+            # see if there are any files on disk that match this pattern
+            rendered_paths = glob.glob(frame_glob)
+
+            if rendered_paths:
+                # we only need one path to publish, so take the first one and
+                # let the base class collector handle it
+                item = super(MayaSessionCollector, self)._collect_file(
+                    parent_item,
+                    rendered_paths[0],
+                    frame_sequence=True
+                )
+
+                # the item has been created. update the display name to include
+                # the an indication of what it is and why it was collected
+                item.name = "%s (Render Layer: %s)" % (item.name, layer)

@@ -27,7 +27,8 @@ menu_prebuild = [   ['File Save...', '1825592'],
                     ['Shotgun Panel...', '2399777'],
                     ['Publish...', '3378887'],
                     ['Sync Frame Range with Shotgun', '3366874'],
-                    ['Snapshot History...', '3313077']]
+                    ['Snapshot History...', '3313077'],
+                    ['Render Setup...', '1244983']]
 
 logger = sgtk.LogManager.get_logger(__name__)
 
@@ -117,7 +118,8 @@ def EnhanceMainMenu():
     submenu = c4d.BaseContainer()
     submenu.InsData(c4d.MENURESOURCE_SUBTITLE, "{}".format(engine.context))
 
-    for item in get_plugins():
+    registred_commands = get_plugins()
+    for item in registred_commands:
         m_type = item[0][1].get('properties').get('type', 'default')
         if 'context_menu' in m_type:
             submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(item[-1]))
@@ -136,15 +138,21 @@ def PluginMessage(id, data):
         os.kill(os.getpid(), signal.SIGTERM)
 
 def register_plugins():
+    # registred_commands = get_plugins()
     for item in menu_prebuild:
-            c4d.plugins.RegisterCommandPlugin(
-                id=int(item[-1]),
-                str=item[0],
-                info=0,
-                help='',
-                icon=None,
-                dat=callbackPlugin(callback=item[0])
-            )
+        icon = None
+        # for y in registred_commands:
+        #     if (item[-1] in y):
+        #         icon = c4d.bitmaps.BaseBitmap()
+        #         icon.InitWith(y[0][1].get('properties').get('icon'))
+        c4d.plugins.RegisterCommandPlugin(
+            id=int(item[-1]),
+            str=item[0],
+            info=c4d.PLUGINFLAG_HIDEPLUGINMENU,
+            help='',
+            icon=icon,
+            dat=callbackPlugin(callback=item[0])
+        )
 
 if __name__ == '__main__':
     register_plugins()

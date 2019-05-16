@@ -662,7 +662,8 @@ class CinemaEngine(Engine):
 
                 for x in mainMenu:
                     if x[1][c4d.MENURESOURCE_SUBTITLE] == 'Shotgun':
-                        mainMenu.RemoveData(x[0])
+                        #mainMenu.RemoveData(x[0])
+                        [x[1].RemoveData(y[0]) for y in x[1]]
                 
                 menu = c4d.BaseContainer()
                 menu.InsData(c4d.MENURESOURCE_SUBTITLE, "Shotgun")
@@ -685,6 +686,8 @@ class CinemaEngine(Engine):
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2436236))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1825592))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3378887))
+                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1244983))
+
                 menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3279052))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1506973))
