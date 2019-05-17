@@ -109,8 +109,6 @@ class BreakdownSceneOperations(Hook):
         doc = c4d.documents.GetActiveDocument()
 
         for i in items:
-            print i
-
             node = i["node"]
             node_type = i["type"]
             new_path = i["path"]
