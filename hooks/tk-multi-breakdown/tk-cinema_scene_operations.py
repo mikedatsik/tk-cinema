@@ -32,6 +32,18 @@ def get_contexts(context, result=None):
 
     return result
 
+def get_all_xrefs(op, filter, output, docpath):
+    while op:
+        if filter(op):
+            if docpath in op[c4d.ID_CA_XREF_FILE]:
+                path = op[c4d.ID_CA_XREF_FILE]
+            else:
+                path = os.path.abspath(os.path.join(docpath, op[c4d.ID_CA_XREF_FILE]))
+            output.append({"node": op, "type": "reference", "path": path})
+        get_all_xrefs(op.GetDown(), filter, output, docpath)
+        op = op.GetNext()
+    return output
+
 
 class BreakdownSceneOperations(Hook):
     """
@@ -74,53 +86,10 @@ class BreakdownSceneOperations(Hook):
         # https://forum.isotropix.com/viewtopic.php?p=14779
 
         refs = []
+        
+        doc = c4d.documents.GetActiveDocument()
+        refs = get_all_xrefs(doc.GetFirstObject(), lambda x: x.CheckType(c4d.Oxref), [], doc.GetDocumentPath())
 
-        types = (
-            "GeometryPolyfile",
-            "GeometryFurFile",
-            "GeometryVolumeFile",
-            "GeometryBundleAlembic",
-            "GeometryBundleUsd",
-            "ProcessAlembicExport",
-            "LightPhysicalSphere",
-            "TextureMapFile",
-            "TextureStreamedMapFile",
-            "TextureOslFile",
-        )
-
-        for type_ in types:
-            objects = ix.api.OfObjectVector()
-            ix.application.get_matching_objects(objects, "*", type_)
-            for object in objects:
-                attr = object.get_attribute("filename")
-                if attr:
-                    ref_path = attr.get_string()
-                    ref_path = ref_path.replace("/", os.path.sep)
-                    refs.append(
-                        {
-                            "attr": attr,
-                            "type": "file",
-                            "path": ref_path,
-                            "node": attr,
-                        }
-                    )
-
-        # also do all the contexts
-        context = ix.get_item("project:/")
-        contexts = get_contexts(context)
-        for context in contexts:
-            attr = context.get_attribute("filename")
-            if attr:
-                ref_path = attr.get_string()
-                ref_path = ref_path.replace("/", os.path.sep)
-                refs.append(
-                    {
-                        "attr": attr,
-                        "type": "file",
-                        "path": ref_path,
-                        "node": attr,
-                    }
-                )
         return refs
 
     def update(self, items):
@@ -137,14 +106,22 @@ class BreakdownSceneOperations(Hook):
         """
 
         engine = self.parent.engine
+        doc = c4d.documents.GetActiveDocument()
 
         for i in items:
-            attr = i["node"]
+            print i
+
+            node = i["node"]
             node_type = i["type"]
             new_path = i["path"]
+            new_name = i["node"].GetName()
 
-            if node_type == "file":
-                engine.log_debug(
-                    "File %s: Updating to version %s" % (attr, new_path)
-                )
-                attr.set_string(new_path)
+            if node_type == "reference":
+                # maya reference
+                engine.log_debug("Cinema Xref %s: Updating to version %s" % (node, new_path))
+                node.Remove()
+                xref = c4d.BaseObject(c4d.Oxref)
+                doc.InsertObject(xref)
+                xref.SetParameter(c4d.ID_CA_XREF_FILE, new_path, c4d.DESCFLAGS_SET_USERINTERACTION)
+                xref.SetName(new_name)
+                c4d.EventAdd()

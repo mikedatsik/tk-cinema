@@ -20,6 +20,14 @@ __contact__ = "https://www.linkedin.com/in/mykhailo-datsyk/"
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
+def get_all_objects(op, filter, output):
+    while op:
+        if filter(op):
+            output.append(op)
+        get_all_objects(op.GetDown(), filter, output)
+        op = op.GetNext()
+    return output
+
 
 class CinemaSessionCollector(HookBaseClass):
     """
@@ -166,11 +174,12 @@ class CinemaSessionCollector(HookBaseClass):
         )
 
         doc = c4d.documents.GetActiveDocument()
+        cameras = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(5103), [])
         
-        for camera_shape in doc.GetObjects():
-            if camera_shape.GetType() == 5103:
+        for camera in cameras:
+            if camera.GetType() == 5103:
                 # try to determine the camera display name
-                camera_name = camera_shape.GetName()
+                camera_name = camera.GetName()
 
                 cam_item = parent_item.create_item(
                     "cinema.session.camera",
@@ -183,7 +192,7 @@ class CinemaSessionCollector(HookBaseClass):
                 # store the camera name so that any attached plugin knows which
                 # camera this item represents!
                 cam_item.properties["camera_name"] = camera_name
-                cam_item.properties["camera_shape"] = camera_shape
+                cam_item.properties["camera_shape"] = camera
                 cam_item.properties["publish_type"] = "Camera"
 
                 self.logger.debug("Collected cemera:" + camera_name)
@@ -292,43 +301,47 @@ class CinemaSessionCollector(HookBaseClass):
 
         doc = c4d.documents.GetActiveDocument()
 
-        takedata = doc.GetTakeData()
-        main = takedata.GetMainTake()
-        talelist = [main]
-        talelist = talelist + main.GetChildren()
+        active_data = doc.GetActiveRenderData()
+        active_video_post = active_data.GetFirstVideoPost()
 
-        work_template = parent_item.properties.get("work_template")
-        work_fields = work_template.get_fields(doc[c4d.DOCUMENT_FILEPATH])
+        if active_data.GetName() == 'shotgun_render' and active_video_post.GetName() == 'Octane Renderer':
+            takedata = doc.GetTakeData()
+            main = takedata.GetMainTake()
+            talelist = [main]
+            talelist = talelist + main.GetChildren()
 
-        for take in talelist:
-            renderData = take.GetRenderData(takedata)
-            if renderData:
-                renderer = renderData.GetFirstVideoPost()
-                renderpath = renderer[c4d.SET_PASSES_SAVEPATH]
-                rpd = {'_doc': doc, '_rData': renderData, '_rBc': renderData.GetData(), '_frame': 0}
-                fpath = c4d.modules.tokensystem.FilenameConvertTokens(renderpath, rpd)
-                fpath = os.path.dirname(fpath)
-                if renderer[c4d.SET_PASSES_MULTILAYER]:
+            work_template = parent_item.properties.get("work_template")
+            work_fields = work_template.get_fields(doc[c4d.DOCUMENT_FILEPATH])
+
+            for take in talelist:
+                renderData = take.GetRenderData(takedata)
+                if renderData:
+                    renderer = renderData.GetFirstVideoPost()
+                    renderpath = renderer[c4d.SET_PASSES_SAVEPATH]
+                    rpd = {'_doc': doc, '_rData': renderData, '_rBc': renderData.GetData(), '_frame': 0}
+                    fpath = c4d.modules.tokensystem.FilenameConvertTokens(renderpath, rpd)
                     fpath = os.path.dirname(fpath)
-            
-            joined_path = os.path.abspath(
-                            os.path.join(
-                                doc.GetDocumentPath(), fpath.replace('$take', take.GetName())
-                                ))
-            if os.path.exists(joined_path):
-                for layer in os.listdir(joined_path):
-                    rendered_paths = glob.glob(
-                        os.path.join(joined_path, layer, '*.exr'))
+                    if renderer[c4d.SET_PASSES_MULTILAYER]:
+                        fpath = os.path.dirname(fpath)
+                
+                joined_path = os.path.abspath(
+                                os.path.join(
+                                    doc.GetDocumentPath(), fpath.replace('$take', take.GetName())
+                                    ))
+                if os.path.exists(joined_path):
+                    for layer in os.listdir(joined_path):
+                        rendered_paths = glob.glob(
+                            os.path.join(joined_path, layer, '*.exr'))
 
-                    self.logger.info("Processing render take_layer: %s_%s" % (take.GetName(), layer))
+                        self.logger.info("Processing render take_layer: %s_%s" % (take.GetName(), layer))
 
-                    if rendered_paths:
-                        item = super(CinemaSessionCollector, self)._collect_file(
-                            parent_item,
-                            rendered_paths[0],
-                            frame_sequence=True
-                        )
-                        render_name = "Take_Layer: %s_%s" % (take.GetName(), layer)
-                        item.properties["publish_version"] = work_fields["version"]
-                        item.properties["publish_name"] = render_name
-                        item.name = render_name
+                        if rendered_paths:
+                            item = super(CinemaSessionCollector, self)._collect_file(
+                                parent_item,
+                                rendered_paths[0],
+                                frame_sequence=True
+                            )
+                            render_name = "Take_Layer: %s_%s" % (take.GetName(), layer)
+                            item.properties["publish_version"] = work_fields["version"]
+                            item.properties["publish_name"] = render_name
+                            item.name = render_name

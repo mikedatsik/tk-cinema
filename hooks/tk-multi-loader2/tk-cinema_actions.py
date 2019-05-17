@@ -223,6 +223,7 @@ class CinemaActions(HookBaseClass):
         doc.InsertObject(xref)
         xref.SetParameter(c4d.ID_CA_XREF_FILE, path, c4d.DESCFLAGS_SET_USERINTERACTION)
         xref.SetName(namespace)
+        c4d.EventAdd()
 
     def _do_import(self, path, sg_publish_data):
         """
