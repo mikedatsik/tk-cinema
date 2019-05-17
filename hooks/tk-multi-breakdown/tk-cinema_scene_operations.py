@@ -39,7 +39,14 @@ def get_all_xrefs(op, filter, output, docpath):
                 path = op[c4d.ID_CA_XREF_FILE]
             else:
                 path = os.path.abspath(os.path.join(docpath, op[c4d.ID_CA_XREF_FILE]))
-            output.append({"node": op, "type": "reference", "path": path})
+            output.append(
+                {
+                    "attr": op.GetName(),
+                    "type": "reference",
+                    "path": path,
+                    "node": op,
+                    }
+                )
         get_all_xrefs(op.GetDown(), filter, output, docpath)
         op = op.GetNext()
     return output
@@ -115,11 +122,15 @@ class BreakdownSceneOperations(Hook):
             new_name = i["node"].GetName()
 
             if node_type == "reference":
-                # maya reference
+                # cinema reference
                 engine.log_debug("Cinema Xref %s: Updating to version %s" % (node, new_path))
+                parent = node.GetUp()
                 node.Remove()
                 xref = c4d.BaseObject(c4d.Oxref)
-                doc.InsertObject(xref)
+                if parent:
+                    xref.InsertUnder(parent)
+                else:
+                    doc.InsertObject(xref)
                 xref.SetParameter(c4d.ID_CA_XREF_FILE, new_path, c4d.DESCFLAGS_SET_USERINTERACTION)
                 xref.SetName(new_name)
                 c4d.EventAdd()
