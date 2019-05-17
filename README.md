@@ -219,6 +219,7 @@ The Publish app allows artists to publish their work so that it can be used by a
 Only the basic publishing of the current session is provided with this app. 
 
 ## [tk-multi-breakdown](https://support.shotgunsoftware.com/hc/en-us/articles/219032988)
+![tk-clarisse_screenshot02](config/images/tk-cinema_screenshot02.PNG)
 
 
 The Scene Breakdown App shows you a list of items you have loaded (referenced) in your scene and tells you which ones are out of date. From this overview, you can select multiple objects and click the update button which will update all your selected items to use the latest published version.
