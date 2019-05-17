@@ -686,7 +686,9 @@ class CinemaEngine(Engine):
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2436236))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1825592))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3378887))
+                menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1244983))
+                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3326292))
 
                 menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3279052))
@@ -694,6 +696,7 @@ class CinemaEngine(Engine):
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3313077))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2399777))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3366874))
+                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(5919542))
                 
                 mainMenu.InsData(c4d.MENURESOURCE_STRING, menu)
 

@@ -28,7 +28,9 @@ menu_prebuild = [   ['File Save...', '1825592'],
                     ['Publish...', '3378887'],
                     ['Sync Frame Range with Shotgun', '3366874'],
                     ['Snapshot History...', '3313077'],
-                    ['Render Setup...', '1244983']]
+                    ['Render Setup...', '1244983'],
+                    ['Playblast...', '3326292'],
+                    ]
 
 logger = sgtk.LogManager.get_logger(__name__)
 

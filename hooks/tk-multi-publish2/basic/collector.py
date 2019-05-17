@@ -289,30 +289,46 @@ class CinemaSessionCollector(HookBaseClass):
 
         # iterate over defined render layers and query the render settings for
         # information about a potential render
-        for layer in cmds.ls(type="renderLayer"):
 
-            self.logger.info("Processing render layer: %s" % (layer,))
+        doc = c4d.documents.GetActiveDocument()
 
-            # use the render settings api to get a path where the frame number
-            # spec is replaced with a '*' which we can use to glob
-            (frame_glob,) = cmds.renderSettings(
-                genericFrameImageName="*",
-                fullPath=True,
-                layer=layer
-            )
+        takedata = doc.GetTakeData()
+        main = takedata.GetMainTake()
+        talelist = [main]
+        talelist = talelist + main.GetChildren()
 
-            # see if there are any files on disk that match this pattern
-            rendered_paths = glob.glob(frame_glob)
+        work_template = parent_item.properties.get("work_template")
+        work_fields = work_template.get_fields(doc[c4d.DOCUMENT_FILEPATH])
 
-            if rendered_paths:
-                # we only need one path to publish, so take the first one and
-                # let the base class collector handle it
-                item = super(MayaSessionCollector, self)._collect_file(
-                    parent_item,
-                    rendered_paths[0],
-                    frame_sequence=True
-                )
+        for take in talelist:
+            renderData = take.GetRenderData(takedata)
+            if renderData:
+                renderer = renderData.GetFirstVideoPost()
+                renderpath = renderer[c4d.SET_PASSES_SAVEPATH]
+                rpd = {'_doc': doc, '_rData': renderData, '_rBc': renderData.GetData(), '_frame': 0}
+                fpath = c4d.modules.tokensystem.FilenameConvertTokens(renderpath, rpd)
+                fpath = os.path.dirname(fpath)
+                if renderer[c4d.SET_PASSES_MULTILAYER]:
+                    fpath = os.path.dirname(fpath)
+            
+            joined_path = os.path.abspath(
+                            os.path.join(
+                                doc.GetDocumentPath(), fpath.replace('$take', take.GetName())
+                                ))
+            if os.path.exists(joined_path):
+                for layer in os.listdir(joined_path):
+                    rendered_paths = glob.glob(
+                        os.path.join(joined_path, layer, '*.exr'))
 
-                # the item has been created. update the display name to include
-                # the an indication of what it is and why it was collected
-                item.name = "%s (Render Layer: %s)" % (item.name, layer)
+                    self.logger.info("Processing render take_layer: %s_%s" % (take.GetName(), layer))
+
+                    if rendered_paths:
+                        item = super(CinemaSessionCollector, self)._collect_file(
+                            parent_item,
+                            rendered_paths[0],
+                            frame_sequence=True
+                        )
+                        render_name = "Take_Layer: %s_%s" % (take.GetName(), layer)
+                        item.properties["publish_version"] = work_fields["version"]
+                        item.properties["publish_name"] = render_name
+                        item.name = render_name
