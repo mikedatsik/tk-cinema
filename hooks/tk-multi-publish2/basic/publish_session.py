@@ -337,11 +337,6 @@ class CinemaSessionPublishPlugin(HookBaseClass):
         # update the item with the saved session path
         item.properties["path"] = path
 
-        # add dependencies for the base class to register when publishing
-        item.properties[
-            "publish_dependencies"
-        ] = _cinema_find_additional_session_dependencies()
-
         # let the base class register the publish
         super(CinemaSessionPublishPlugin, self).publish(settings, item)
 
@@ -361,59 +356,6 @@ class CinemaSessionPublishPlugin(HookBaseClass):
 
         # bump the session file to the next version
         self._save_to_next_version(item.properties["path"], item, _save_session)
-
-
-def _cinema_find_additional_session_dependencies():
-    """
-    Find additional dependencies from the session
-    """
-    # These classes contain a filename propertym which could contain
-    # publishedFiles and could count as dependencies.
-    #
-    # This link has got a way to get these types dynamically
-    # but it briefly changes the state of the scene.
-    # https://forum.isotropix.com/viewtopic.php?p=14779
-
-    types = (
-        "GeometryPolyfile",
-        "GeometryFurFile",
-        "GeometryVolumeFile",
-        "GeometryBundleAlembic",
-        "GeometryBundleUsd",
-        "ProcessAlembicExport",
-        "LightPhysicalSphere",
-        "TextureMapFile",
-        "TextureStreamedMapFile",
-        "TextureOslFile",
-    )
-
-    # default implementation looks for references and
-    # textures (file nodes) and returns any paths that
-    # match a template defined in the configuration
-    ref_paths = set()
-    # for type_ in types:
-    #     objects = ix.api.OfObjectVector()
-    #     ix.application.get_matching_objects(objects, "*", type_)
-    #     for object in objects:
-    #         attr = object.get_attribute("filename")
-    #         if attr:
-    #             path = attr.get_string()
-    #             if isinstance(path, unicode):
-    #                 path = path.encode("utf-8")
-    #             ref_paths.add(path)
-
-    # # also do the contexts
-    # context = ix.get_item('project:/')
-    # contexts = get_contexts(context)
-    # for context in contexts:
-    #     attr = context.get_attribute("filename")
-    #     if attr:
-    #         path = attr.get_string()
-    #         if isinstance(path, unicode):
-    #             path = path.encode("utf-8")
-    #         ref_paths.add(path)
-
-    return list(ref_paths)
 
 
 def _session_path():

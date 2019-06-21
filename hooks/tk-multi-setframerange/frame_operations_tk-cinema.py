@@ -25,7 +25,7 @@ class FrameOperation(HookBaseClass):
     current scene
     """
 
-    def execute(self, operation, in_frame=None, out_frame=None, **kwargs):
+    def execute(self, operation, head_in_frame=None, in_frame=None, out_frame=None, tail_out_frame=None, **kwargs):
         """
         Main hook entry point
 
@@ -54,11 +54,19 @@ class FrameOperation(HookBaseClass):
             return (current_in, current_out)
         elif operation == "set_frame_range":
             # Set Project MIN/MAX Time
-            doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(in_frame, fps)
-            doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(out_frame, fps)
+            if head_in_frame:
+                doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(head_in_frame, fps)
+            else:
+                doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(in_frame, fps)
             
+            if tail_out_frame:
+                doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(tail_out_frame, fps)
+            else:
+                doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(out_frame, fps)
+
             # Set Project Preview MIN/MAX Time
             doc[c4d.DOCUMENT_LOOPMINTIME] = c4d.BaseTime(in_frame, fps)
             doc[c4d.DOCUMENT_LOOPMAXTIME] = c4d.BaseTime(out_frame, fps)
-
+            
+            doc[c4d.DOCUMENT_LOOPMINTIME] = c4d.BaseTime(in_frame, fps)
             return True

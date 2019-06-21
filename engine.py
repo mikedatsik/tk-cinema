@@ -425,7 +425,7 @@ class CinemaEngine(Engine):
 
             {
                 "name": "Cinema",
-                "version": "2017 Update 4",
+                "version": "R20",
             }
 
         The returned dictionary is of following form on an error preventing
@@ -696,7 +696,7 @@ class CinemaEngine(Engine):
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3313077))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2399777))
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3366874))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(5919542))
+                # menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(5919542))
                 
                 mainMenu.InsData(c4d.MENURESOURCE_STRING, menu)
 
