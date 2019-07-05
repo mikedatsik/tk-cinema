@@ -12,6 +12,7 @@ import fnmatch
 import os
 
 import c4d
+import r8s_utils
 
 import sgtk
 
@@ -267,7 +268,8 @@ class CinemaCameraPublishPlugin(HookBaseClass):
         # end of the publish method
 
         # the camera to publish
-        cam_shape = item.properties["camera_shape"]
+        doc = c4d.documents.GetActiveDocument()
+        obj = item.properties["camera_shape"]
 
         # get the path to create and publish
         publish_path = item.properties["publish_path"]
@@ -276,22 +278,32 @@ class CinemaCameraPublishPlugin(HookBaseClass):
         publish_folder = os.path.dirname(publish_path)
         self.parent.ensure_folder_exists(publish_folder)
 
-        doc = c4d.documents.GetActiveDocument()
-        tdoc = c4d.documents.IsolateObjects(doc, [cam_shape])
+        # Get Frames and FPS
+        fps = doc.GetFps()
+        fstart = doc.GetLoopMinTime().GetFrame(fps)
+        fend = doc.GetLoopMaxTime().GetFrame(fps)
 
+        baked_obj = r8s_utils.bakeAnim(doc, obj, fstart-1, fend+1)
+
+        # Isolate Backed Object
+        tdoc = c4d.documents.IsolateObjects(doc, [baked_obj])
+
+        # Get Cinema 4D Alembic Plugin ID
         plug = c4d.plugins.FindPlugin(1028082, c4d.PLUGINTYPE_SCENESAVER)
 
+        # Set Alembic Export Params
         op = {}
         plug.Message(c4d.MSG_RETRIEVEPRIVATEDATA, op)
         abcExport = op["imexporter"]
-
+        
         abcExport[c4d.ABCEXPORT_SELECTION_ONLY] = False
         abcExport[c4d.ABCEXPORT_PARTICLES] = True
-        abcExport[c4d.ABCEXPORT_FRAME_START] = doc.GetLoopMinTime().GetFrame(doc.GetFps())
-        abcExport[c4d.ABCEXPORT_FRAME_END] = doc.GetLoopMaxTime().GetFrame(doc.GetFps())
+        abcExport[c4d.ABCEXPORT_FRAME_START] = fstart
+        abcExport[c4d.ABCEXPORT_FRAME_END] = fend
 
         if c4d.documents.SaveDocument(tdoc, publish_path, c4d.SAVEDOCUMENTFLAGS_DONTADDTORECENTLIST, 1028082):
             self.logger.debug("Run export command.")
+            baked_obj.Remove()
         else:
             self.logger.error("Failed to export camera.")
 

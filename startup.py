@@ -60,6 +60,9 @@ class CinemaLauncher(SoftwareLauncher):
         sgtk.util.append_path_to_env_var(
             "g_additionalModulePath", startup_path
         )
+        sgtk.util.append_path_to_env_var(
+            "PYTHONPATH", os.path.join(startup_path, 'libs')
+        )        
         required_env["g_additionalModulePath"] = os.environ[
             "g_additionalModulePath"
         ]

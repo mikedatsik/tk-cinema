@@ -82,16 +82,6 @@ class BreakdownSceneOperations(Hook):
         available. Any such versions are then displayed in the UI as out of 
         date.
         """
-
-        # These classes contain a filename property which could contain
-        # publishedFiles and could count as dependencies.
-        #
-        # This link has got a way to get these types dynamically
-        # but it briefly changes the state of the scene so we
-        # choose to hard code the types here instead , which seems
-        # faster and safer.
-        # https://forum.isotropix.com/viewtopic.php?p=14779
-
         refs = []
         
         doc = c4d.documents.GetActiveDocument()
