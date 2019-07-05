@@ -318,6 +318,8 @@ class CinemaSessionCollector(HookBaseClass):
                 if renderData:
                     renderer = renderData.GetFirstVideoPost()
                     renderpath = renderer[c4d.SET_PASSES_SAVEPATH]
+                    ext_list = ['tiff', 'psd', 'exr', 'jpg', 'tga', 'png', 'psb', 'exr']
+                    extension = ext_list[renderer[c4d.SET_PASSES_FILEFORMAT]-1]
                     rpd = {'_doc': doc, '_rData': renderData, '_rBc': renderData.GetData(), '_frame': 0}
                     fpath = c4d.modules.tokensystem.FilenameConvertTokens(renderpath, rpd)
                     fpath = os.path.dirname(fpath)
@@ -331,7 +333,7 @@ class CinemaSessionCollector(HookBaseClass):
                 if os.path.exists(joined_path):
                     for layer in os.listdir(joined_path):
                         rendered_paths = glob.glob(
-                            os.path.join(joined_path, layer, '*.exr'))
+                            os.path.join(joined_path, layer, '*.{}'.format(extension)))
 
                         self.logger.info("Processing render take_layer: %s_%s" % (take.GetName(), layer))
 
@@ -341,7 +343,7 @@ class CinemaSessionCollector(HookBaseClass):
                                 rendered_paths[0],
                                 frame_sequence=True
                             )
-                            render_name = "Take_Layer: %s_%s" % (take.GetName(), layer)
+                            # render_name = "Take_Layer: %s_%s" % (take.GetName(), layer)
                             item.properties["publish_version"] = work_fields["version"]
-                            item.properties["publish_name"] = render_name
-                            item.name = render_name
+                            # item.properties["publish_name"] = render_name
+                            # item.name = render_name

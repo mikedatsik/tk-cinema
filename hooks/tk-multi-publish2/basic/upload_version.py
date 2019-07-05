@@ -12,6 +12,7 @@ import os
 import pprint
 import sys
 import sgtk
+import c4d
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
@@ -301,6 +302,10 @@ class UploadVersionPlugin(HookBaseClass):
 
         codec = "H264"
         quality = 80
+        
+        doc = c4d.documents.GetActiveDocument()
+        fps = doc[c4d.DOCUMENT_FPS]
+
         lut = Draft.LUT.CreateRec709()
 
         fs = fileseq.findSequencesOnDisk(inFile)[0]
@@ -319,7 +324,7 @@ class UploadVersionPlugin(HookBaseClass):
             inputWidth = firstFrame.width
             inputHeight = firstFrame.height
 
-            encoder = Draft.VideoEncoder( output_path,  width=inputWidth, height=inputHeight, quality=quality, codec=codec )
+            encoder = Draft.VideoEncoder( output_path,  fps=fps, width=inputWidth, height=inputHeight, quality=quality, codec=codec )
 
 
             progressCounter = 0
