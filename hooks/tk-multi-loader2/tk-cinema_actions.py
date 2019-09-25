@@ -214,7 +214,8 @@ class CinemaActions(HookBaseClass):
         if not os.path.exists(path):
             raise TankError("File not found on disk - '%s'" % path)
 
-        namespace = "%s %s" % (sg_publish_data.get("entity").get("name"), sg_publish_data.get("name"))
+        #namespace = "%s %s" % (sg_publish_data.get("entity").get("name"), sg_publish_data.get("name"))
+        namespace = sg_publish_data.get("name")
         namespace = namespace.replace(" ", "_")
         
         doc = c4d.documents.GetActiveDocument()
@@ -222,6 +223,7 @@ class CinemaActions(HookBaseClass):
         xref = c4d.BaseObject(c4d.Oxref)
         doc.InsertObject(xref)
         xref.SetParameter(c4d.ID_CA_XREF_FILE, path, c4d.DESCFLAGS_SET_USERINTERACTION)
+        xref.SetParameter(c4d.ID_CA_XREF_NAMESPACE, "", c4d.DESCFLAGS_SET_USERINTERACTION)
         xref.SetName(namespace)
         c4d.EventAdd()
 

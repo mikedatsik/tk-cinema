@@ -4,11 +4,9 @@ Cinema 4D Shotgun toolkit base on [Diego Garcia Huerta](https://www.linkedin.com
 Developing in progress...
 
 ## TODO:
-* Publish components hooks
-* Load components hooks
-  * Add Node material load and texture
-* Breakdown
-* Make more intuitive menu build instead of hard
+* Find method to stop listen Open, Switch Message Events.
+* Clear My Load and Publish functions
+* Find Way to Build Menu Automatic.
 
 ![tk-cinema_screenshot01](config/images/tk-cinema_screenshot01.PNG)
 
@@ -34,7 +32,7 @@ With the engine, hooks for most of the standard tk application are provided:
 
 (I've also included a hook that allows to take a [thumbnail](hooks/thumbnail.py) of cinema window, useful for configuring tk-multi-snapshot for example.)
 
-**Note: This engine has been tested in Windows using Cinema 4D version 20**
+**Note: This engine has been tested in Windows using Cinema 4D R20**
 
 
 ## Engine Installation
@@ -124,7 +122,7 @@ and add the following changes from this file:
 engines.tk-cinema.location:
   type: git
   branch: master
-  path: https://github.com/diegogarciahuerta/tk-cinema.git
+  path: https://github.com/mikedatsik/tk-cinema.git
   version: v1.0.0
 ```
 
@@ -209,32 +207,20 @@ Hooks are provided to be able to use this tk-app, similar to workfiles2.
 
 The Shotgun Loader lets you quickly overview and browse the files that you have published to Shotgun. A searchable tree view navigation system makes it easy to quickly get to the task, shot or asset that you are looking for and once there the loader shows a thumbnail based overview of all the publishes for that item. Through configurable hooks you can then easily reference or import a publish into your current scene.
 
-The hooks provided support all the input reference and import formats from Cinema 4D, from alembic files, usd files (Cinema 4D iFX v4.0+), lwo, obj, Cinema 4D project files, etc...
+The hooks provided support all the input reference and import formats from Cinema 4D.
 
 ## [tk-multi-publish2](https://support.shotgunsoftware.com/hc/en-us/articles/115000097513)
 ![tk-cinema_screenshot03](config/images/tk-cinema_screenshot05.PNG)
 
 The Publish app allows artists to publish their work so that it can be used by artists downstream. It supports traditional publishing workflows within the artist’s content creation software as well as stand-alone publishing of any file on disk. When working in content creation software and using the basic Shotgun integration, the app will automatically discover and display items for the artist to publish. For more sophisticated production needs, studios can write custom publish plugins to drive artist workflows.
 
-Only the basic publishing of the current session is provided with this app. 
+Only the basic publishing of the current session is provided with this app.
 
 ## [tk-multi-breakdown](https://support.shotgunsoftware.com/hc/en-us/articles/219032988)
 ![tk-clarisse_screenshot02](config/images/tk-cinema_screenshot02.PNG)
 
 
 The Scene Breakdown App shows you a list of items you have loaded (referenced) in your scene and tells you which ones are out of date. From this overview, you can select multiple objects and click the update button which will update all your selected items to use the latest published version.
-
-Hook provided support the updating of the following type of nodes (basically, alembic, usd, or any other geometric format supported at the time of writting):
-- GeometryPolyfile
-- GeometryFurFile
-- GeometryVolumeFile
-- GeometryBundleAlembic
-- GeometryBundleUsd
-- ProcessAlembicExport
-- LightPhysicalSphere
-- TextureMapFile
-- TextureStreamedMapFile
-- TextureOslFile
 
 ## [tk-multi-setframerange](https://support.shotgunsoftware.com/hc/en-us/articles/219033038)
 This is a simple yet useful app that syncs your current file with the latest frame range in Shotgun for the associated shot. If a change to the cut has come in from editorial, quickly and safely update the scene you are working on using this app. Towards the end, it will display a UI with information about what got changed.

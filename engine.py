@@ -17,8 +17,6 @@ import inspect
 import logging
 import traceback
 
-from functools import wraps, partial
-
 import tank
 from tank.log import LogManager
 from tank.platform import Engine
@@ -31,12 +29,6 @@ from c4d import gui
 __author__ = "Mykhailo Datsyk"
 __contact__ = "https://www.linkedin.com/in/mykhailo-datsyk/"
 
-# initialize our shotgun structure for the session
-if not hasattr(c4d, "shotgun"):
-    # use a dummy class to keep references to menus
-    c4d.shotgun = lambda: None
-    c4d.shotgun.menu_callbacks = {}
-
 
 def show_error(msg):
     print("Shotgun Error | Cinema engine | %s " % msg)
@@ -44,7 +36,6 @@ def show_error(msg):
         "Shotgun Error 'Cinema engine': \n {}".format(msg),
         type=c4d.GEMB_OK
     )
-
 
 def show_warning(msg):
     gui.MessageDialog(
@@ -81,109 +72,9 @@ def display_debug(msg):
         print("%s - Shotgun Debug | Cinema engine | %s " % (t, msg))
 
 
-SCENE_EVENT_NAMES = (
-    "new_project",
-    "clear_project",
-    "import_project",
-    "load_project",
-    "save_project",
-    "load_startup_scene",
-)
-
-SCENE_QUIT_EVENT_NAME = "quit"
-
-
-class SceneEventWatcher(object):
-    """
-    Encapsulates event handling for multiple scene events and routes them
-    into a single callback.
-
-    This uses monkey patching some of the functions in the cinema application
-
-    Specifying run_once=True in the constructor causes all events to be
-    cleaned up after the first one has triggered
-    """
-
-    def __init__(self, cb_fn, run_once=False):
-        """
-        Constructor.
-
-        :param cb_fn: Callback to invoke everytime a scene event happens.
-        :param scene_events: List of scene events to watch for. Defaults to 
-            new, open and save.
-        :param run_once: If True, the watcher will notify only on the first 
-            event. Defaults to False.
-        """
-        self.__cb_fn = cb_fn
-        self.__run_once = run_once
-        self.__wrapped_fns = {}
-
-        # register scene event callbacks:
-        self.start_watching()
-
-    def start_watching(self):
-        """
-        Starts watching for scene events.
-        """
-        # if currently watching then stop:
-        self.stop_watching()
-
-        # now add callbacks to watch for some scene events:
-        # for event_name in SCENE_EVENT_NAMES:
-        #     try:
-        #         event_fn = getattr(ix.application, event_name)
-        #         event_fn = wrapped(
-        #             event_fn,
-        #             self,
-        #             post_callback=SceneEventWatcher.__scene_event_callback,
-        #         )
-        #         self.__wrapped_fns[event_name] = event_fn
-        #         setattr(ix.application, event_name, event_fn)
-        #         display_debug("Registered callback on %s " % event_name)
-        #     except Exception:
-        #         traceback.print_exc()
-        #         # report warning...
-        #         continue
-
-        # create a callback that will be run when Cinema
-        # exits so we can do some clean-up:
-        # event_fn = getattr(ix.application, SCENE_QUIT_EVENT_NAME)
-        # event_fn = wrapped(
-        #     event_fn,
-        #     self,
-        #     pre_callback=SceneEventWatcher.__cinema_exiting_callback,
-        # )
-        # self.__wrapped_fns[SCENE_QUIT_EVENT_NAME] = event_fn
-        # setattr(ix.application, SCENE_QUIT_EVENT_NAME, event_fn)
-
-    def stop_watching(self):
-        """
-        Stops watching the Cinema scene.
-        """
-        # for event_name, event_fn in self.__wrapped_fns.iteritems():
-        #     setattr(ix.application, event_name, event_fn._original)
-        self.__wrapped_fns = {}
-
-    @staticmethod
-    def __scene_event_callback(watcher):
-        """
-        Called on a scene event:
-        """
-        if watcher.__run_once:
-            watcher.stop_watching()
-        watcher.__cb_fn()
-
-    @staticmethod
-    def __cinema_exiting_callback(watcher):
-        """
-        Called on Cinema exit - should clean up any existing calbacks
-        """
-        watcher.stop_watching()
-
 ###############################################################################
 # methods to support the state when the engine cannot start up
 # for example if a non-tank file is loaded in cinema
-
 
 def refresh_engine(engine_name, prev_context, menu_name):
     """
@@ -235,14 +126,8 @@ def refresh_engine(engine_name, prev_context, menu_name):
             message += "Traceback (most recent call last):\n"
             message += "\n".join(traceback.format_tb(exc_traceback))
 
-            # build disabled menu
-            create_sgtk_disabled_menu(menu_name)
-
             display_error(message)
             return
-
-    # now remove the shotgun disabled menu if it exists.
-    remove_sgtk_disabled_menu(menu_name)
 
     # shotgun menu may have been removed, so add it back in if its not already
     # there.
@@ -251,87 +136,8 @@ def refresh_engine(engine_name, prev_context, menu_name):
     if ctx != tank.platform.current_engine().context:
         current_engine.change_context(ctx)
 
-
-def on_scene_event_callback(engine_name, prev_context, menu_name):
-    """
-    Callback that's run whenever a scene is saved or opened.
-    """
-    try:
-        refresh_engine(engine_name, prev_context, menu_name)
-    except Exception:
-        (exc_type, exc_value, exc_traceback) = sys.exc_info()
-        message = ""
-        message += (
-            "Message: Shotgun encountered a problem changing the "
-            "Engine's context.\n"
-        )
-        message += "Please contact you technical support team for more "
-        message += "information.\n\n"
-        message += "Exception: %s - %s\n" % (exc_type, exc_value)
-        message += "Traceback (most recent call last):\n"
-        message += "\n".join(traceback.format_tb(exc_traceback))
-        show_error(message)
-
-
-def sgtk_disabled_message():
-    """
-    Explain why tank is disabled.
-    """
-    msg = (
-        "Shotgun integration is disabled because it cannot recognize "
-        "the currently opened file.  Try opening another file or restarting "
-        "Cinema."
-    )
-
-    show_warning(msg)
-
-
-def clear_sgtk_menu(menu_name):
-    if not c4d.is_gui_application():
-        # don't create menu in not interactive mode
-        return
-
-    sg_menu = get_sgtk_root_menu(menu_name)
-    sg_menu.remove_all_commands()
-    c4d.shotgun.menu_callbacks = {}
-
-
-def get_sgtk_root_menu(menu_name):
-    menu = c4d.application.get_main_menu()
-
-    sg_menu = menu.get_item(menu_name + ">")
-    if not sg_menu:
-        sg_menu = menu.add_command(menu_name + ">")
-    return sg_menu
-
-
-def create_sgtk_disabled_menu(menu_name):
-    """
-    Render a special "shotgun is disabled" menu
-    """
-    if not c4d.is_gui_application():
-        # don't create menu in not interactive mode
-        return
-
-    sg_menu = get_sgtk_root_menu(menu_name)
-    menu_item = menu_name + ">Sgtk is disabled."
-    c4d.shotgun.menu_callbacks[menu_item] = sgtk_disabled_message
-    menu.add_command_as_script(
-        menu_name + ">Sgtk is disabled.",
-        "c4d.shotgun.menu_callbacks[%s]" % menu_item,
-    )
-
-
-def remove_sgtk_disabled_menu(menu_name):
-    """
-    Clear the shotgun menu
-    """
-    clear_sgtk_menu(menu_name)
-
-
 ###############################################################################
 # The Tank Cinema engine
-
 
 class CinemaEngine(Engine):
     """
@@ -446,9 +252,6 @@ class CinemaEngine(Engine):
             pass
         return host_info
 
-    ###########################################################################
-    # init and destroy
-
     def pre_app_init(self):
         """
         Runs after the engine is set up but before any apps have been
@@ -476,22 +279,20 @@ class CinemaEngine(Engine):
                 "The current platform is not supported! Supported platforms "
                 "are Mac, Linux 64 and Windows 64."
             )
-        version = str(c4d.GetC4DVersion())
-        cinema_build_version = '{}.{}'.format(version[:2], version[2])
 
-        cinema_ver = float(version[:2])
+        cinema_ver = c4d.GetC4DVersion()/1000
 
-        if cinema_ver < 19.0:
+        if cinema_ver < 19:
             msg = "Shotgun integration is not compatible with Cinema "
             msg += "versions older than 20.0"
             raise tank.TankError(msg)
 
-        if cinema_ver > 19.0:
+        if cinema_ver > 19:
             # show a warning that this version of Cinema isn't yet fully
             # tested with Shotgun:
             msg = (
                 "The Shotgun Pipeline Toolkit has not yet been fully tested "
-                "with Cinema %s.\n"
+                "with Cinema R%s.\n"
                 "You can continue to use Toolkit but you may experience bugs "
                 "or instability."
                 "\n\nUse at your own risk." % (cinema_ver)
@@ -508,7 +309,7 @@ class CinemaEngine(Engine):
 
                 # split off the major version number - accomodate complex
                 # version strings and decimals:
-                major_version_number_str = cinema_build_version.split(".")[0]
+                major_version_number_str = str(cinema_ver)
                 if (
                     major_version_number_str
                     and major_version_number_str.isdigit()
@@ -549,20 +350,6 @@ class CinemaEngine(Engine):
         if self.get_setting("use_sgtk_as_menu_name", False):
             self._menu_name = "Sgtk"
 
-        if self.get_setting("automatic_context_switch", True):
-            # need to watch some scene events in case the engine needs
-            # rebuilding:
-
-            cb_fn = partial(
-                on_scene_event_callback,
-                engine_name=self.instance_name,
-                prev_context=self.context,
-                menu_name=self._menu_name,
-            )
-
-            self.__watcher = SceneEventWatcher(cb_fn, run_once=False)
-            self.logger.debug("Registered open and save callbacks.")
-
     def create_shotgun_menu(self):
         """
         Creates the main shotgun menu in cinema.
@@ -573,14 +360,11 @@ class CinemaEngine(Engine):
         # only create the shotgun menu if not in batch mode and menu doesn't
         # already exist
         if self.has_ui:
-            # self._menu_handle = get_sgtk_root_menu(self._menu_name)
-
             # create our menu handler
             tk_cinema = self.import_module("tk_cinema")
-            # self._menu_generator = tk_cinema.MenuGenerator(
-            #     self, self._menu_handle
-            # )
-        #     self._menu_generator.create_menu()
+            self._menu_generator = tk_cinema.MenuGenerator(self, self._menu_name)
+            self._menu_generator.create_menu()
+
             return True
 
         return False
@@ -603,9 +387,6 @@ class CinemaEngine(Engine):
             self._initialize_dark_look_and_feel()
             qt_app.aboutToQuit.connect(qt_app.deleteLater)
 
-        # import pyqt_cinema
-        # qt_app.show()
-
     def post_app_init(self):
         """
         Called when all apps have initialized
@@ -614,7 +395,6 @@ class CinemaEngine(Engine):
 
         # for some readon this engine command get's lost so we add it back
         self.__register_reload_command()
-        self.create_shotgun_menu()
 
         # Run a series of app instance commands at startup.
         self._run_app_instance_commands()
@@ -639,16 +419,7 @@ class CinemaEngine(Engine):
             # that has a callback registered with the new context baked in.
             # This will ensure that the context_from_path call that occurs
             # after a File->Open receives an up-to-date "previous" context.
-            self.__watcher.stop_watching()
 
-            cb_fn = partial(
-                on_scene_event_callback,
-                engine_name=self.instance_name,
-                prev_context=self.context,
-                menu_name=self._menu_name,
-            )
-
-            self.__watcher = SceneEventWatcher(cb_fn, run_once=False)
             self.logger.debug(
                 "Registered new open and save callbacks before"
                 " changing context."
@@ -658,50 +429,6 @@ class CinemaEngine(Engine):
             if old_context != new_context:
                 self.create_shotgun_menu()
             
-                mainMenu = c4d.gui.GetMenuResource("M_EDITOR")
-
-                for x in mainMenu:
-                    if x[1][c4d.MENURESOURCE_SUBTITLE] == 'Shotgun':
-                        #mainMenu.RemoveData(x[0])
-                        [x[1].RemoveData(y[0]) for y in x[1]]
-                
-                menu = c4d.BaseContainer()
-                menu.InsData(c4d.MENURESOURCE_SUBTITLE, "Shotgun")
-                
-                submenu = c4d.BaseContainer()
-                submenu.InsData(c4d.MENURESOURCE_SUBTITLE, "{}".format(self.context))
-                
-                submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2701393))
-                submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2158662))
-                submenu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-                submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2188709))
-                submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2419038))
-                submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3271712))
-                submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2574358))
-                menu.InsData(c4d.MENURESOURCE_SUBMENU, submenu)
-
-                menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1760964))
-
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2436236))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1825592))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3378887))
-                menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1244983))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3326292))
-
-                menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3279052))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1506973))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3313077))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2399777))
-                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3366874))
-                # menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(5919542))
-                
-                mainMenu.InsData(c4d.MENURESOURCE_STRING, menu)
-
-                c4d.gui.UpdateMenus()
-
     def _run_app_instance_commands(self):
         """
         Runs the series of app instance commands listed in the 'run_at_startup' 
@@ -739,9 +466,7 @@ class CinemaEngine(Engine):
                         "%s configuration setting 'run_at_startup'"
                         " requests app '%s' that is not installed."
                     ),
-                    self.name,
-                    app_instance_name,
-                )
+                    self.name, app_instance_name)
             else:
                 if not setting_command_name:
                     # Run all commands of the given app instance.
@@ -758,7 +483,7 @@ class CinemaEngine(Engine):
                             app_instance_name,
                             command_name,
                         )
-                        cinema.utils.executeDeferred(command_function)
+                        command_function()
                 else:
                     # Run the command whose name is listed in the
                     # 'run_at_startup' setting.
@@ -773,7 +498,7 @@ class CinemaEngine(Engine):
                             app_instance_name,
                             setting_command_name,
                         )
-                        cinema.utils.executeDeferred(command_function)
+                        command_function()
                     else:
                         known_commands = ", ".join(
                             "'%s'" % name for name in command_dict
@@ -795,10 +520,6 @@ class CinemaEngine(Engine):
         Stops watching scene events and tears down menu.
         """
         self.logger.debug("%s: Destroying...", self)
-
-        if self.get_setting("automatic_context_switch", True):
-            # stop watching scene events
-            self.__watcher.stop_watching()
 
     def _init_pyside(self):
         """
@@ -872,31 +593,18 @@ class CinemaEngine(Engine):
         """
         Get Qt Main in windows
         """
-        import ctypes
-        from PySide import QtGui
-        from PySide import shiboken
-
-        activeWindow = ctypes.windll.user32.GetForegroundWindow()
-        ptr = ctypes.windll.user32.GetWindow(activeWindow,4)
-        parent = shiboken.wrapInstance(ptr, QtGui.QMainWindow)
-        
-
-        return parent
+        return None
 
     @property
     def has_ui(self):
         """
         Detect and return if cinema is running in batch mode
         """
-        # if not c4d.is_gui_application():
-        #     # batch mode or prompt mode
-        #     return False
-        # else:
-        #     return True
-        return True
-
-    ###########################################################################
-    # logging
+        if not c4d.gui.GetMenuResource("M_EDITOR"):
+            # batch mode or prompt mode
+            return False
+        else:
+            return True
 
     def _emit_log_message(self, handler, record):
         """
@@ -936,9 +644,6 @@ class CinemaEngine(Engine):
 
         # Display the message in Cinema script editor in a thread safe manner
         self.async_execute_in_main_thread(fct, msg)
-
-    ###########################################################################
-    # scene and project management
 
     def close_windows(self):
         """

@@ -44,6 +44,7 @@ try:
 except:
     engine = tank.platform.engine.current_engine()
 
+print engine
 
 def get_plugins():
     out = []
@@ -112,6 +113,27 @@ class callbackPlugin(c4d.plugins.CommandData):
         return True
 
 
+class SceneChangeEvent(c4d.plugins.MessageData):
+    def __init__(self):
+        self.document = c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
+
+    def CoreMessage(self, id, bc):
+        if id == c4d.EVMSG_CHANGE:
+            new_document = c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
+            if new_document != self.document:
+                if "Untitled " not in new_document:
+                    self.document = new_document
+                    try:
+                        current_engine = tank.platform.current_engine()
+                        tk = tank.tank_from_path(self.document)
+                        logger.debug("Extracted sgtk instance: '%r' from path: '%r'", tk, self.document)
+                        ctx = tk.context_from_path(self.document)
+                        current_engine.change_context(ctx)
+                    except tank.TankError, e:
+                        logger.exception("Could not execute tank_from_path('%s')" % self.document)
+        return True
+
+
 def EnhanceMainMenu():
     mainMenu = c4d.gui.GetMenuResource("M_EDITOR")
     menu = c4d.BaseContainer()
@@ -140,22 +162,18 @@ def PluginMessage(id, data):
         os.kill(os.getpid(), signal.SIGTERM)
 
 def register_plugins():
-    # registred_commands = get_plugins()
+
+    c4d.plugins.RegisterMessagePlugin(id=15151510, str="", info=0, dat=SceneChangeEvent())
+    
     for item in menu_prebuild:
-        icon = None
-        # for y in registred_commands:
-        #     if (item[-1] in y):
-        #         icon = c4d.bitmaps.BaseBitmap()
-        #         icon.InitWith(y[0][1].get('properties').get('icon'))
         c4d.plugins.RegisterCommandPlugin(
             id=int(item[-1]),
             str=item[0],
             info=c4d.PLUGINFLAG_HIDEPLUGINMENU,
             help='',
-            icon=icon,
+            icon=None,
             dat=callbackPlugin(callback=item[0])
         )
 
 if __name__ == '__main__':
     register_plugins()
-
