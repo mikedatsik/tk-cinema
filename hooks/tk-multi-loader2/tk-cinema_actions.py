@@ -13,9 +13,9 @@ Hook that loads defines all the available actions, broken down by publish type.
 """
 
 import os
+import c4d
 from contextlib import contextmanager
 
-import c4d
 import sgtk
 from sgtk.errors import TankError
 
@@ -209,13 +209,10 @@ class CinemaActions(HookBaseClass):
         :param sg_publish_data: Shotgun data dictionary with all the standard
                                 publish fields.
         """
-        app = self.parent
-
         if not os.path.exists(path):
             raise TankError("File not found on disk - '%s'" % path)
 
-        #namespace = "%s %s" % (sg_publish_data.get("entity").get("name"), sg_publish_data.get("name"))
-        namespace = sg_publish_data.get("name")
+        namespace = "%s %s" % (sg_publish_data.get("entity").get("name"), sg_publish_data.get("name"))
         namespace = namespace.replace(" ", "_")
         
         doc = c4d.documents.GetActiveDocument()
@@ -241,27 +238,13 @@ class CinemaActions(HookBaseClass):
         if not os.path.exists(path):
             raise TankError("File not found on disk - '%s'" % path)
 
-        image_extensions = (".jpg", ".exr")
-
-        import_scene_extensions = (".lws", ".abc")
-        import_geometry_extensions = (".abc", ".obj")
-        import_volume_extensions = (".vdb",)
-        import_project_extensions = (".c4d",)
+        import_project_extensions = (".c4d")
 
         _, extension = os.path.splitext(path)
 
         if extension.lower() in import_project_extensions:
             c4d.documents.MergeDocument(doc, path, 0)
             c4d.EventAdd()
-
-        #     if extension.lower() in import_scene_extensions:
-        #         ix.api.IOHelpers.import_scene(ix.application, path)
-        #     elif extension.lower() in image_extensions:
-        #         ix.import_image(path)
-        #     elif extension.lower() in import_geometry_extensions:
-        #         ix.import_geometry(path)
-        #     elif extension.lower() in import_volume_extensions:
-        #         ix.import_volume(path)
 
     def _create_texture_node(self, path, sg_publish_data):
         """

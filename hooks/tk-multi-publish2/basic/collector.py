@@ -8,25 +8,17 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights 
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import glob
 import os
 import c4d
-import sgtk
+import glob
 
+import sgtk
 
 __author__ = "Mykhailo Datsyk"
 __contact__ = "https://www.linkedin.com/in/mykhailo-datsyk/"
 
 
 HookBaseClass = sgtk.get_hook_baseclass()
-
-def get_all_objects(op, filter, output):
-    while op:
-        if filter(op):
-            output.append(op)
-        get_all_objects(op.GetDown(), filter, output)
-        op = op.GetNext()
-    return output
 
 
 class CinemaSessionCollector(HookBaseClass):
@@ -92,8 +84,6 @@ class CinemaSessionCollector(HookBaseClass):
 
         self.collect_playblasts(item, project_root)
         self.collect_alembic_caches(item, project_root)
-        self._collect_session_cameras(item)
-        self.collect_rendered_images(item)
 
     def collect_current_cinema_session(self, settings, parent_item):
         """
@@ -156,46 +146,6 @@ class CinemaSessionCollector(HookBaseClass):
         self.logger.info("Collected current Cinema scene")
 
         return session_item
-
-    def _collect_session_cameras(self, parent_item):
-        """
-        Creates items for each camera to be exported.
-
-        :param parent_item:
-        :return:
-        """
-
-        # get the icon path to display for camera items
-        icon_path = os.path.join(
-            self.disk_location,
-            os.pardir,
-            "icons",
-            "camera.png"
-        )
-
-        doc = c4d.documents.GetActiveDocument()
-        cameras = get_all_objects(doc.GetFirstObject(), lambda x: x.CheckType(5103), [])
-        
-        for camera in cameras:
-            if camera.GetType() == 5103:
-                # try to determine the camera display name
-                camera_name = camera.GetName()
-
-                cam_item = parent_item.create_item(
-                    "cinema.session.camera",
-                    "Camera",
-                    camera_name
-                )
-
-                cam_item.set_icon_from_path(icon_path)
-
-                # store the camera name so that any attached plugin knows which
-                # camera this item represents!
-                cam_item.properties["camera_name"] = camera_name
-                cam_item.properties["camera_shape"] = camera
-                cam_item.properties["publish_type"] = "Camera"
-
-                self.logger.debug("Collected cemera:" + camera_name)
 
     def collect_playblasts(self, parent_item, project_root):
         """
@@ -287,63 +237,3 @@ class CinemaSessionCollector(HookBaseClass):
                 parent_item,
                 cache_path
             )
-
-    def collect_rendered_images(self, parent_item):
-        """
-        Creates items for any rendered images that can be identified by
-        render layers in the file.
-        :param parent_item: Parent Item instance
-        :return:
-        """
-
-        # iterate over defined render layers and query the render settings for
-        # information about a potential render
-
-        doc = c4d.documents.GetActiveDocument()
-
-        active_data = doc.GetActiveRenderData()
-        active_video_post = active_data.GetFirstVideoPost()
-
-        if active_data.GetName() == 'shotgun_render' and active_video_post.GetName() == 'Octane Renderer':
-            takedata = doc.GetTakeData()
-            main = takedata.GetMainTake()
-            talelist = [main]
-            talelist = talelist + main.GetChildren()
-
-            work_template = parent_item.properties.get("work_template")
-            work_fields = work_template.get_fields(doc[c4d.DOCUMENT_FILEPATH])
-
-            for take in talelist:
-                renderData = take.GetRenderData(takedata)
-                if renderData:
-                    renderer = renderData.GetFirstVideoPost()
-                    renderpath = renderer[c4d.SET_PASSES_SAVEPATH]
-                    ext_list = ['tiff', 'psd', 'exr', 'jpg', 'tga', 'png', 'psb', 'exr']
-                    extension = ext_list[renderer[c4d.SET_PASSES_FILEFORMAT]-1]
-                    rpd = {'_doc': doc, '_rData': renderData, '_rBc': renderData.GetData(), '_frame': 0}
-                    fpath = c4d.modules.tokensystem.FilenameConvertTokens(renderpath, rpd)
-                    fpath = os.path.dirname(fpath)
-                    if renderer[c4d.SET_PASSES_MULTILAYER]:
-                        fpath = os.path.dirname(fpath)
-                
-                joined_path = os.path.abspath(
-                                os.path.join(
-                                    doc.GetDocumentPath(), fpath.replace('$take', take.GetName())
-                                    ))
-                if os.path.exists(joined_path):
-                    for layer in os.listdir(joined_path):
-                        rendered_paths = glob.glob(
-                            os.path.join(joined_path, layer, '*.{}'.format(extension)))
-
-                        self.logger.info("Processing render take_layer: %s_%s" % (take.GetName(), layer))
-
-                        if rendered_paths:
-                            item = super(CinemaSessionCollector, self)._collect_file(
-                                parent_item,
-                                rendered_paths[0],
-                                frame_sequence=True
-                            )
-                            # render_name = "Take_Layer: %s_%s" % (take.GetName(), layer)
-                            item.properties["publish_version"] = work_fields["version"]
-                            # item.properties["publish_name"] = render_name
-                            # item.name = render_name

@@ -1,18 +1,12 @@
 # Cinema 4D Shotgun toolkit engine
 
 Cinema 4D Shotgun toolkit base on [Diego Garcia Huerta](https://www.linkedin.com/in/diegogh/) Clarisse Shotgun toolkit.
-Developing in progress...
-
-## TODO:
-* Find method to stop listen Open, Switch Message Events.
-* Clear My Load and Publish functions
-* Find Way to Build Menu Automatic.
 
 ![tk-cinema_screenshot01](config/images/tk-cinema_screenshot01.PNG)
 
 ## Overview
 
-Implementation of a shotgun toolkit engine for [**Cinema 4D**](https://www.maxon.net). This engine is based on the [tk-maya engine](https://github.com/shotgunsoftware/tk-maya) heavily adapted to Cinema 4D. It supports the classic boostrap startup methodology and integrates with cinema adding a shotgun menu in it's menu bar.
+Implementation of a shotgun toolkit engine for [**Cinema 4D**](https://www.maxon.net). This engine is based on the [tk-clarisse engine](https://github.com/diegogarciahuerta/tk-clarisse) adapted to Cinema 4D. It supports the classic boostrap startup methodology and integrates with cinema adding a shotgun menu in it's menu bar.
 
 * [Engine Installation](#engine-installation)
 * [Configuring your project for Shotgun Toolkit](#configuring-your-project-for-shotgun-toolkit)
@@ -30,7 +24,7 @@ With the engine, hooks for most of the standard tk application are provided:
 * [tk-multi-breakdown](#tk-multi-breakdown)
 * [tk-multi-setframerange](#tk-multi-setframerange) ( see notes below as this is a fork from the original shotgun repository to allow having hooks per engine, as the original one has support only for certain applications)
 
-(I've also included a hook that allows to take a [thumbnail](hooks/thumbnail.py) of cinema window, useful for configuring tk-multi-snapshot for example.)
+(Also included a hook that allows to take a [thumbnail](hooks/thumbnail.py) of cinema window, useful for configuring tk-multi-snapshot for example.)
 
 **Note: This engine has been tested in Windows using Cinema 4D R20**
 
@@ -60,19 +54,33 @@ If you haven't done it yet, make sure you have gone through the basic steps to c
 
 * click on *Advanced project setup*
 
-    ![advanced_project_setup](config/images/advanced_project_setup.png)
+<p align="center">
+  <img src="config/images/advanced_project_setup.png">
+</p>
 
 * *Select a configuration*: "Shotgun Default" or pick an existing project that you have already setup pages and filters for.
-![select_a_project_configuration](config/images/select_a_project_configuration.png)
+
+<p align="center">
+  <img src="config/images/select_a_project_configuration.png">
+</p>
 
 * *Select a Shotgun Configuration*: select "default" which will download the standard templates/configuration from shotgun. (this documentation is written assuming you have this configuration)
-![select_a_shotgun_configuration](config/images/select_a_shotgun_configuration.png)
+
+<p align="center">
+  <img src="config/images/select_a_shotgun_configuration.png">
+</p>
 
 * *Define Storages*: Make sure you name your first storage "primary", and a choose a primary folder where all the 'jobs' will be stored, in this case "D:\demo\jobs" for illustrative purposes.
-![define_storages](config/images/define_storages.png)
+
+<p align="center">
+  <img src="config/images/define_storages.png">
+</p>
 
 * *Project Folder Name*: This is the name of the project in disk. You might have some sort of naming convention for project that you might follow, or leave as it is. (My advice is that you do not include spaces in the name!)
-![project_folder_name](config/images/project_folder_name.png)
+
+<p align="center">
+  <img src="config/images/project_folder_name.png">
+</p>
 
 * *Select Deployment*: Choose "Centralized Setup". This will be the location of the configuration files (that we will be modifying later). For example, you could place the specific configuration for a project (in this example called game_config) within a folder called "configs" at the same level then the jobs folder, something like: 
 ```shell
@@ -98,8 +106,10 @@ If you haven't done it yet, make sure you have gone through the basic steps to c
             └───frameworks
 ```
 (Note that this might not be suitable for more complex setups, like distributed configurations)
-![select_deployment](config/images/select_deployment.png)
 
+<p align="center">
+  <img src="config/images/select_deployment.png">
+</p>
 
 ## Modifying the toolkit configuration files to add this engine and related apps
 
@@ -158,19 +168,26 @@ In order for Cinema 4D to show up in the shotgun launcher, we need to add it to 
 * Navigate to your shotgun url, ie. `example.shotgunstudio.com`, and once logged in, clink in the Shotgun Settings menu, the arrow at the top right of the webpage, close to your user picture. 
 * Click in the Software menu
 
-  ![software_entity](config/images/software_entity.png)
+<p align="center">
+  <img src="config/images/software_entity.png">
+</p>
 
 * We will create a new entry for Cinema 4D, called "Cinema 4D". The description was conveniently copied and pasted from Wikipedia.
-![create_new_software](config/images/create_new_software.png)
+
+<p align="center">
+  <img src="config/images/create_new_software.png">
+</p>
 
 * We should now specify the engine this software will use. "tk-cinema"
-![software_specify_engine](config/images/software_specify_engine.png)
+
+<p align="center">
+  <img src="config/images/software_specify_engine.png">
+</p>
 
 * Note that you can restrict this application to certain projects by specifying the project under the projects column. If no projects are specified this application will show up for all the projects that have this engine in their configuration files.
 
 If you want more information on how to configure software launches, here is the detailed documentation from shotgun.
 [Configuring software launches](https://support.shotgunsoftware.com/hc/en-us/articles/115000067493#Configuring%20the%20software%20in%20Shotgun%20Desktop)
-
 
 ## Caching and downloading the engine into disk
 
@@ -189,8 +206,9 @@ One last step is to cache the engine and apps from the configuration files into 
 
 If we now go back and forth from our project in shotgun desktop ( < arrow top left if you are already within a project ), we should be able to see Cinema 4D as an application to launch.
 
-![cinema_is_configured.png](config/images/cinema_is_configured.png)
-
+<p align="center">
+  <img src="config/images/cinema_is_configured.png">
+</p>
 
 ## [tk-multi-workfiles2](https://support.shotgunsoftware.com/hc/en-us/articles/219033088)
 This application forms the basis for file management in the Shotgun Pipeline Toolkit. It lets you jump around quickly between your various Shotgun entities and gets you started working quickly. No path needs to be specified as the application manages that behind the scenes. The application helps you manage your working files inside a Work Area and makes it easy to share your work with others.
@@ -203,22 +221,30 @@ A Shotgun Snapshot is a quick incremental backup that lets you version and manag
 Hooks are provided to be able to use this tk-app, similar to workfiles2.
 
 ## [tk-multi-loader2](https://support.shotgunsoftware.com/hc/en-us/articles/219033078)
-![tk-cinema_screenshot01](config/images/tk-cinema_screenshot01.PNG)
+
+<p align="center">
+  <img src="config/images/tk-cinema_screenshot01.PNG">
+</p>
 
 The Shotgun Loader lets you quickly overview and browse the files that you have published to Shotgun. A searchable tree view navigation system makes it easy to quickly get to the task, shot or asset that you are looking for and once there the loader shows a thumbnail based overview of all the publishes for that item. Through configurable hooks you can then easily reference or import a publish into your current scene.
 
 The hooks provided support all the input reference and import formats from Cinema 4D.
 
 ## [tk-multi-publish2](https://support.shotgunsoftware.com/hc/en-us/articles/115000097513)
-![tk-cinema_screenshot03](config/images/tk-cinema_screenshot05.PNG)
+
+<p align="center">
+  <img src="config/images/tk-cinema_screenshot05.PNG">
+</p>
 
 The Publish app allows artists to publish their work so that it can be used by artists downstream. It supports traditional publishing workflows within the artist’s content creation software as well as stand-alone publishing of any file on disk. When working in content creation software and using the basic Shotgun integration, the app will automatically discover and display items for the artist to publish. For more sophisticated production needs, studios can write custom publish plugins to drive artist workflows.
 
 Only the basic publishing of the current session is provided with this app.
 
 ## [tk-multi-breakdown](https://support.shotgunsoftware.com/hc/en-us/articles/219032988)
-![tk-clarisse_screenshot02](config/images/tk-cinema_screenshot02.PNG)
 
+<p align="center">
+  <img src="config/images/tk-cinema_screenshot02.PNG">
+</p>
 
 The Scene Breakdown App shows you a list of items you have loaded (referenced) in your scene and tells you which ones are out of date. From this overview, you can select multiple objects and click the update button which will update all your selected items to use the latest published version.
 

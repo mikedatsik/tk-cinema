@@ -12,7 +12,7 @@ configuration:
                      it isn't yet fully supported and tested with Toolkit.  To disable the warning
                      dialog for the version you are testing, it is recomended that you set this
                      value to the current major version + 1."
-        default_value: 3
+        default_value: 20
 
     debug_logging: 
         type: bool
@@ -63,7 +63,7 @@ configuration:
 
     launch_builtin_plugins:
         type: list
-        description: Comma-separated list of tk-Cinema plugins to load when launching Cinema. Use
+        description: Comma-separated list of tk-cinema plugins to load when launching Cinema. Use
                      of this feature disables the classic mechanism for bootstrapping Toolkit
                      when Cinema is launched.
         allows_empty: True

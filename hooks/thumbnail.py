@@ -35,7 +35,6 @@ class ThumbnailHook(Hook):
                         If the hook returns None then the screenshot
                         functionality will be enabled in the UI.
         """
-        # get the engine name from the parent object (app/engine/etc.)
         engine = self.parent.engine
         engine_name = engine.name
 

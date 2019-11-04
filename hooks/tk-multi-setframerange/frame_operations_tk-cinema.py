@@ -55,11 +55,13 @@ class FrameOperation(HookBaseClass):
         elif operation == "set_frame_range":
             # Set Project MIN/MAX Time
             if head_in_frame:
+                # Set Handles if exists
                 doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(head_in_frame, fps)
             else:
                 doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(in_frame, fps)
             
             if tail_out_frame:
+                # Set Handles if exists
                 doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(tail_out_frame, fps)
             else:
                 doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(out_frame, fps)

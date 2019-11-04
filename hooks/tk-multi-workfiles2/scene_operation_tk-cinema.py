@@ -9,7 +9,6 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
-
 import c4d
 
 import sgtk
@@ -27,19 +26,6 @@ class SceneOperation(HookClass):
     Hook called to perform an operation with the
     current scene
     """
-
-    # def set_content_directory(self, file_path):
-    #     """
-    #     Set Cinema Project Content's directory preference $CDIR
-
-    #     :param file_path:       String
-    #                             The full path to the cinema project
-    #     """
-    #     content_dir = os.path.join(os.path.dirname(file_path), "Content")
-    #     preferences = ix.application.get_prefs()
-    #     preferences.set_string_value(
-    #         "project", "content_directory", content_dir
-    #     )
 
     def execute(
         self,
@@ -100,16 +86,9 @@ class SceneOperation(HookClass):
 
         if operation == "current_path":
             # return the current scene path
-
-            project_name = doc.GetDocumentPath()
-            project_path = doc.GetDocumentName()
-            current_project_filename = os.path.join(project_path, project_name)
-
-            return current_project_filename
-
+            return doc[c4d.DOCUMENT_FILEPATH]
         elif operation == "open":
             c4d.documents.LoadFile(file_path)
-
         elif operation == "save":
             c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
             c4d.documents.LoadFile(file_path)
@@ -117,5 +96,4 @@ class SceneOperation(HookClass):
             c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
             c4d.documents.LoadFile(file_path)
         elif operation == "reset":
-            # natron_app.resetProject()
             return True

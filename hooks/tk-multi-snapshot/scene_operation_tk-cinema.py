@@ -9,7 +9,6 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
-
 import c4d
 
 import tank
@@ -47,16 +46,10 @@ class SceneOperation(Hook):
 
         if operation == "current_path":
             # return the current scene path
-            project_path = doc.GetDocumentPath()
-            project_name = doc.GetDocumentName()
-            path = os.path.join(project_path, project_name)
-            return path
+            return doc[c4d.DOCUMENT_FILEPATH]
         elif operation == "open":
             c4d.documents.LoadFile(file_path)
         elif operation == "save":
-            project_path = doc.GetDocumentPath()
-            project_name = doc.GetDocumentName()
-            current_project = os.path.join(project_path, project_name)
-            
+            current_project = doc[c4d.DOCUMENT_FILEPATH]
             c4d.documents.SaveDocument(doc, str(current_project), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
             c4d.documents.LoadFile(current_project)

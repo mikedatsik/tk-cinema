@@ -65,9 +65,6 @@ class MenuGenerator(object):
         menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2436236))
         menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1825592))
         menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3378887))
-        menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1244983))
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3326292))
 
         menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
         menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3279052))

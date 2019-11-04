@@ -9,9 +9,8 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
-from contextlib import contextmanager
-
 import c4d
+from contextlib import contextmanager
 
 import sgtk
 from sgtk.util.filesystem import ensure_folder_exists
@@ -292,11 +291,7 @@ def _session_path():
     Return the path to the current session
     :return:
     """
-    doc = c4d.documents.GetActiveDocument()
-
-    project_path = doc.GetDocumentPath()
-    project_name = doc.GetDocumentName()
-    path = os.path.join(project_path, project_name)
+    path = c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
 
     if isinstance(path, unicode):
         path = path.encode("utf-8")

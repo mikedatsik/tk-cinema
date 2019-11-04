@@ -8,29 +8,14 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-from tank import Hook
-import c4d
 import os
+import c4d
 
+from tank import Hook
 
 __author__ = "Mykhailo Datsyk"
 __contact__ = "https://www.linkedin.com/in/mykhailo-datsyk/"
 
-
-def get_contexts(context, result=None):
-    """
-    Returns all the subcontexts of the given context recursively
-    """
-    if result is None:
-        result = []
-
-    result.append(context)
-    subcontext_count = context.get_context_count()
-    for i in range(subcontext_count):
-        subcontext = context.get_context(i)
-        get_contexts(subcontext, result=result)
-
-    return result
 
 def get_all_xrefs(op, filter, output, docpath):
     while op:
@@ -112,7 +97,7 @@ class BreakdownSceneOperations(Hook):
             new_name = i["node"].GetName()
 
             if node_type == "reference":
-                # cinema reference
+                # Cinema Xref
                 engine.log_debug("Cinema Xref %s: Updating to version %s" % (node, new_path))
                 parent = node.GetUp()
                 node.Remove()

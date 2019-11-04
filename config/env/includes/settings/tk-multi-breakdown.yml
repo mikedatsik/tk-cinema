@@ -8,13 +8,17 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-# Author: Diego Garcia Huerta
-# Contact: https://www.linkedin.com/in/diegogh/
+# Author: Mykhailo Datsyk
+# Contact: https://www.linkedin.com/in/mykhailo-datsyk/
 #
 # YOU SHOULD MERGE these entries into your tk-app yaml configuration file, as
 # THIS FILE BY ITSELF WILL NOT WORK 
 # These are the additions to get cinema engine up and running with the 
 # default tk-apps for this environment
+
+################################################################################
+
+# -- Cinema
 
 settings.tk-multi-breakdown.cinema:
   hook_scene_operations: '{engine}/tk-multi-breakdown/tk-cinema_scene_operations.py'

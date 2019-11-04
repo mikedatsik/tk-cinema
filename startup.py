@@ -29,6 +29,7 @@ class CinemaLauncher(SoftwareLauncher):
         ],
         "win32": [
             "C:/Program Files/MAXON/Cinema 4D {version}/CINEMA 4D.exe",
+            "C:/Program Files/MAXON Cinema 4D {version}/CINEMA 4D.exe",
             "$CINEMA_BIN_DIR/CINEMA 4D.exe"
         ]
     }

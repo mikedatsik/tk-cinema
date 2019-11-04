@@ -8,8 +8,8 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-# Author: Diego Garcia Huerta
-# Contact: https://www.linkedin.com/in/diegogh/
+# Author: Mykhailo Datsyk
+# Contact: https://www.linkedin.com/in/mykhailo-datsyk/
 #
 # YOU SHOULD MERGE these entries into your engine_locations.yml environment 
 # file, as
@@ -17,12 +17,11 @@
 # These are the additions to get cinema engine up and running with the 
 # default tk-apps for this environment
 
-# Cinema
+################################################################################
+
+# -- Cinema
 engines.tk-cinema.location:
-  type: path
-  path: C:\Users\diego\GoogleDrive\Development\factor64\tk-cinema
-
-  # type: git
-  # path: https://github.com/diegogarciahuerta/tk-cinema
-  # version: v1.0.0
-
+  type: git
+  branch: master
+  path: https://github.com/mikedatsik/tk-cinema.git
+  version: v1.0.0

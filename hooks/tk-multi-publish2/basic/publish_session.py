@@ -9,9 +9,9 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
+import c4d
 from contextlib import contextmanager
 
-import c4d
 import sgtk
 from sgtk.util.filesystem import ensure_folder_exists
 
@@ -21,22 +21,6 @@ __contact__ = "https://www.linkedin.com/in/mykhailo-datsyk/"
 
 
 HookBaseClass = sgtk.get_hook_baseclass()
-
-
-def get_contexts(context, result=None):
-    """
-    Returns all the subcontexts of the given context recursively
-    """
-    if result is None:
-        result = []
-
-    result.append(context)
-    subcontext_count = context.get_context_count()
-    for i in range(subcontext_count):
-        subcontext = context.get_context(i)
-        get_contexts(subcontext, result=result)
-
-    return result
 
 
 class CinemaSessionPublishPlugin(HookBaseClass):
@@ -363,11 +347,7 @@ def _session_path():
     Return the path to the current session
     :return:
     """
-    doc = c4d.documents.GetActiveDocument()
-
-    project_path = doc.GetDocumentPath()
-    project_name = doc.GetDocumentName()
-    path = os.path.join(project_path, project_name)
+    path = c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
 
     if isinstance(path, unicode):
         path = path.encode("utf-8")
