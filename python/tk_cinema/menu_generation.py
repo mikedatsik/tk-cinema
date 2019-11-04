@@ -22,6 +22,7 @@ import traceback
 from tank.platform.qt import QtGui, QtCore
 
 import c4d
+import constant_apps
 
 
 __author__ = "Mykhailo Datsyk"
@@ -46,33 +47,19 @@ class MenuGenerator(object):
         
         menu = c4d.BaseContainer()
         menu.InsData(c4d.MENURESOURCE_SUBTITLE, self._menu_name)
-        
+
         submenu = c4d.BaseContainer()
         submenu.InsData(c4d.MENURESOURCE_SUBTITLE, "{}".format(self._engine.context))
+
+        for app, app_id, place in constant_apps.menu_prebuild:
+            if "submenu" in place:
+                submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(app_id))
+            elif "main" in place:
+                menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(app_id))
+            else:
+                menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
         
-        submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2701393))
-        submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2158662))
-        submenu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-        submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2188709))
-        submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2419038))
-        submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3271712))
-        submenu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2574358))
         menu.InsData(c4d.MENURESOURCE_SUBMENU, submenu)
-
-        menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1760964))
-
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2436236))
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1825592))
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3378887))
-
-        menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3279052))
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(1506973))
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3313077))
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(2399777))
-        menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(3366874))
-        
         mainMenu.InsData(c4d.MENURESOURCE_STRING, menu)
 
         c4d.gui.UpdateMenus()

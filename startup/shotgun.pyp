@@ -11,6 +11,7 @@ import sgtk
 
 import tank
 
+
 # Need to find better Solution with dinamic menu
 menu_prebuild = [   ['File Save...', '1825592'],
                     ['File Open...', '1760964'],
@@ -42,7 +43,7 @@ try:
 except:
     engine = tank.platform.engine.current_engine()
 
-print engine
+
 
 def get_plugins():
     out = []
@@ -163,15 +164,16 @@ def register_plugins():
 
     c4d.plugins.RegisterMessagePlugin(id=15151510, str="", info=0, dat=SceneChangeEvent())
     
-    for item in menu_prebuild:
-        c4d.plugins.RegisterCommandPlugin(
-            id=int(item[-1]),
-            str=item[0],
-            info=c4d.PLUGINFLAG_HIDEPLUGINMENU,
-            help='',
-            icon=None,
-            dat=callbackPlugin(callback=item[0])
-        )
+    for item in engine.import_module("tk_cinema").constant_apps.menu_prebuild:
+        if not "separator" in item[-1]:
+            c4d.plugins.RegisterCommandPlugin(
+                id=int(item[-2]),
+                str=item[0],
+                info=c4d.PLUGINFLAG_HIDEPLUGINMENU,
+                help='',
+                icon=None,
+                dat=callbackPlugin(callback=item[0])
+            )
 
 if __name__ == '__main__':
     register_plugins()

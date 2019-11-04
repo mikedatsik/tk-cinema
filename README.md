@@ -12,6 +12,7 @@ Implementation of a shotgun toolkit engine for [**Cinema 4D**](https://www.maxon
 * [Configuring your project for Shotgun Toolkit](#configuring-your-project-for-shotgun-toolkit)
 * [Modifying the toolkit configuration files to add this engine and related apps](#modifying-the-toolkit-configuration-files-to-add-this-engine-and-related-apps)
 * [Modifying the Templates](#modifying-the-templates)
+* [Add additional App into Engine](#add-additional-app-into-engine)
 * [Configuring Cinema 4D in the software launcher](#configuring-cinema-in-the-software-launcher)
 * [Caching and downloading the engine into disk](#caching-and-downloading-the-engine-into-disk)
 
@@ -160,7 +161,18 @@ The additions to `config/core/templates.yml` are provided also under the config 
 
 [templates.yml](config/core/templates.yml)
 
+## Add additional App into Engine
 
+To load Cinema preload plugins, when you add additional applications you must add line with new `app name, id, pace in menu`.
+
+In file `python\tk_cinema\constant_apps.py` add following string:
+```
+["app name", "id", "pace in menu"]
+
+Example:
+
+["Sync Frame Range with Shotgun", "3366874", "main"],
+```
 ## Configuring Cinema 4D in the software launcher
 
 In order for Cinema 4D to show up in the shotgun launcher, we need to add it to our list of softwares that are valid for this project.
@@ -199,8 +211,9 @@ One last step is to cache the engine and apps from the configuration files into 
 
 * type `tank cache_apps` , and press enter. Shotgun Toolkit will start revising the changes we have done to the configuration yml files and downloading what is required, in this case the engine and the changes for tk-multi-setframerange app listed below.
 
-![tank_cache_apps](config/images/tank_cache_apps.png)
-
+<p align="center">
+  <img src="config/images/tank_cache_apps.png">
+</p>
 
 ## Cinema 4D engine should be ready to use
 
