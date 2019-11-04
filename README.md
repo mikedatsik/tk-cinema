@@ -131,9 +131,9 @@ and add the following changes from this file:
 ```yaml
 # Cinema 4D
 engines.tk-cinema.location:
-  type: git
-  branch: master
-  path: https://github.com/mikedatsik/tk-cinema.git
+  type: github_release
+  organization: mikedatsik
+  repository: tk-cinema
   version: v1.0.0
 ```
 
