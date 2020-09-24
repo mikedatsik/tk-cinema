@@ -16,7 +16,7 @@ import tank
 menu_prebuild = [   ['File Save...', '1825592'],
                     ['File Open...', '1760964'],
                     ['Snapshot...', '2436236'],
-                    ['Jump to Shotgun', '2701393'], 
+                    ['Jump to Shotgun', '2701393'],
                     ['Jump to File System', '2158662'],
                     ['Jump to Screening Room in RV', '2188709'],
                     ['Jump to Screening Room Web Player', '2419038'],
@@ -103,7 +103,7 @@ class callbackPlugin(c4d.plugins.CommandData):
         for item in engine.commands.items():
             if self.callback in item[0]:
                 item[1].get('callback').__call__()
-        
+
         if self.callback == 'Jump to File System':
             self._jump_to_fs()
         elif self.callback == 'Jump to Shotgun':
@@ -123,11 +123,8 @@ class SceneChangeEvent(c4d.plugins.MessageData):
                 if "Untitled " not in new_document:
                     self.document = new_document
                     try:
-                        current_engine = tank.platform.current_engine()
-                        tk = tank.tank_from_path(self.document)
-                        logger.debug("Extracted sgtk instance: '%r' from path: '%r'", tk, self.document)
-                        ctx = tk.context_from_path(self.document)
-                        current_engine.change_context(ctx)
+                        ctx = engine.get_document_context(self.document)
+                        engine.change_context(ctx)
                     except tank.TankError, e:
                         logger.exception("Could not execute tank_from_path('%s')" % self.document)
         return True
@@ -163,7 +160,7 @@ def PluginMessage(id, data):
 def register_plugins():
 
     c4d.plugins.RegisterMessagePlugin(id=15151510, str="", info=0, dat=SceneChangeEvent())
-    
+
     for item in engine.import_module("tk_cinema").constant_apps.menu_prebuild:
         if not "separator" in item[-1]:
             c4d.plugins.RegisterCommandPlugin(

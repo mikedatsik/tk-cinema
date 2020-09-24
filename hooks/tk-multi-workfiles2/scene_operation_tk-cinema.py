@@ -58,7 +58,7 @@ class SceneOperation(HookClass):
                                 - save_file_as
                                 - version_up
 
-        :param file_version:    The version/revision of the file to be opened. 
+        :param file_version:    The version/revision of the file to be opened.
                                 If this is 'None' then the latest version
                                 should be opened.
 
@@ -68,11 +68,12 @@ class SceneOperation(HookClass):
         :returns:               Depends on operation:
                                 'current_path' - Return the current scene
                                                  file path as a String
-                                'reset'        - True if scene was reset to an 
+                                'reset'        - True if scene was reset to an
                                                  empty state, otherwise False
                                 all others     - None
         """
         app = self.parent
+        engine = app.engine
 
         app.log_debug("-" * 50)
         app.log_debug("operation: %s" % operation)
@@ -84,8 +85,13 @@ class SceneOperation(HookClass):
 
         doc = c4d.documents.GetActiveDocument()
 
+        if operation in ['open', 'save', 'save_as']:
+            # Store the full Shotgun Context for the given file_path
+            # This will be used by shotgun.pyp to ensure the correct
+            # context is set when the c4d document is changed.
+            engine.set_document_context(file_path, context)
+
         if operation == "current_path":
-            # return the current scene path
             return doc[c4d.DOCUMENT_FILEPATH]
         elif operation == "open":
             c4d.documents.LoadFile(file_path)

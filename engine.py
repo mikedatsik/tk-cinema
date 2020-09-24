@@ -88,7 +88,7 @@ def refresh_engine(engine_name, prev_context, menu_name):
         return
 
     doc = c4d.documents.GetActiveDocument()
-    
+
     scene_path = doc.GetDocumentPath()
     scene_name = doc.GetDocumentName()
 
@@ -428,10 +428,10 @@ class CinemaEngine(Engine):
             # finally create the menu with the new context if needed
             if old_context != new_context:
                 self.create_shotgun_menu()
-            
+
     def _run_app_instance_commands(self):
         """
-        Runs the series of app instance commands listed in the 'run_at_startup' 
+        Runs the series of app instance commands listed in the 'run_at_startup'
         setting of the environment configuration yaml file.
         """
 
@@ -560,7 +560,7 @@ class CinemaEngine(Engine):
                                           "/Applications/Shotgun.app")
             sys.path.append(os.path.join(desktop_path, "Contents", "Resources",
                                          "Python", "lib", "python2.7",
-                                         "site-packages"))    
+                                         "site-packages"))
 
         elif current_os == "win32":
             desktop_path = os.environ.get("SHOTGUN_DESKTOP_INSTALL_PATH",
@@ -668,3 +668,34 @@ class CinemaEngine(Engine):
                 self.logger.error(
                     "Cannot close dialog %s: %s", dialog_window_title, exception
                 )
+
+    # Add methods to store context based on c4d document paths. This allows us
+    # to store and load contexts rather than relying on the context_from_path
+    # method, which can yield a reduced context depending on how templates are
+    # configured.
+
+    def _init_shotgun_cache(self):
+        if not hasattr(c4d, '_shotgun_cache'):
+            c4d._shotgun_cache = {'DOCUMENT_CONTEXT_MAP': {}}
+
+    def get_document_context(self, doc_path):
+        '''Retrieve a shotgun context using a document's file path.
+
+        Falls back to tk.context_from_path.
+        '''
+
+        self._init_shotgun_cache()
+
+        doc_path = doc_path.replace('\\', '/').lower()
+        if doc_path in c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP']:
+            return c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP'][doc_path]
+        else:
+            return self.sgtk.context_from_path(doc_path)
+
+    def set_document_context(self, doc_path, context):
+        '''Store a shotgun context using a document's file path.'''
+
+        self._init_shotgun_cache()
+
+        doc_path = doc_path.replace('\\', '/').lower()
+        c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP'][doc_path] = context
