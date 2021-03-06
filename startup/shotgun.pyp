@@ -50,7 +50,7 @@ def get_plugins():
     for item in engine.commands.items():
         tmp = [item]
         m = hashlib.md5()
-        m.update(item[0])
+        m.update(item[0].encode('utf-8'))
         plug_id = str(int(m.hexdigest(), 16))[0:7]
         tmp.append(plug_id)
         out.append(tmp)
@@ -125,7 +125,7 @@ class SceneChangeEvent(c4d.plugins.MessageData):
                     try:
                         ctx = engine.get_document_context(self.document)
                         engine.change_context(ctx)
-                    except tank.TankError, e:
+                    except tank.TankError as e:
                         logger.exception("Could not execute tank_from_path('%s')" % self.document)
         return True
 

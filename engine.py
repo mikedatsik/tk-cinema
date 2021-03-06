@@ -438,7 +438,7 @@ class CinemaEngine(Engine):
         # Build a dictionary mapping app instance names to dictionaries of
         # commands they registered with the engine.
         app_instance_commands = {}
-        for (command_name, value) in self.commands.iteritems():
+        for (command_name, value) in self.commands.items():
             app_instance = value["properties"].get("app")
             if app_instance:
                 # Add entry 'command name: command function' to the command
@@ -476,7 +476,7 @@ class CinemaEngine(Engine):
                     for (
                         command_name,
                         command_function,
-                    ) in command_dict.iteritems():
+                    ) in command_dict.items():
                         self.logger.debug(
                             "%s startup running app '%s' command '%s'.",
                             self.name,

@@ -22,7 +22,7 @@ import traceback
 from tank.platform.qt import QtGui, QtCore
 
 import c4d
-import constant_apps
+from . import constant_apps
 
 
 __author__ = "Mykhailo Datsyk"
@@ -44,7 +44,7 @@ class MenuGenerator(object):
         for index, x in enumerate(mainMenu):
             if x[1][c4d.MENURESOURCE_SUBTITLE] == self._menu_name:
                 mainMenu.RemoveIndex(index)
-        
+
         menu = c4d.BaseContainer()
         menu.InsData(c4d.MENURESOURCE_SUBTITLE, self._menu_name)
 
@@ -58,7 +58,7 @@ class MenuGenerator(object):
                 menu.InsData(c4d.MENURESOURCE_COMMAND, "PLUGIN_CMD_{}".format(app_id))
             else:
                 menu.InsData(c4d.MENURESOURCE_SEPERATOR, True)
-        
+
         menu.InsData(c4d.MENURESOURCE_SUBMENU, submenu)
         mainMenu.InsData(c4d.MENURESOURCE_STRING, menu)
 
