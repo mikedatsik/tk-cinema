@@ -21,54 +21,53 @@ __contact__ = "https://www.linkedin.com/in/mykhailo-datsyk/"
 
 class FrameOperation(HookBaseClass):
     """
-    Hook called to perform a frame operation with the 
+    Hook called to perform a frame operation with the
     current scene
     """
 
-    def execute(self, operation, head_in_frame=None, in_frame=None, out_frame=None, tail_out_frame=None, **kwargs):
+    def get_frame_range(self, **kwargs):
         """
-        Main hook entry point
-
-        :operation: String
-                    Frame operation to perform
-
-        :in_frame: int
-                    in_frame for the current context (e.g. the current shot, 
-                                                      current asset etc)
-
-        :out_frame: int
-                    out_frame for the current context (e.g. the current shot, 
-                                                      current asset etc)
-
-        :returns:   Depends on operation:
-                    'set_frame_range' - Returns if the operation was succesfull
-                    'get_frame_range' - Returns the frame range in the form
-                                        (in_frame, out_frame)
+        get_frame_range will return a tuple of (in_frame, out_frame)
+        :returns: Returns the frame range in the form (in_frame, out_frame)
+        :rtype: tuple[int, int]
         """
 
         doc = c4d.documents.GetActiveDocument()
         fps = doc[c4d.DOCUMENT_FPS]
+        return (
+            doc[c4d.DOCUMENT_MINTIME].GetFrame(fps),
+            doc[c4d.DOCUMENT_MAXTIME].GetFrame(fps)
+        )
 
-        if operation == "get_frame_range":
-            current_in, current_out = doc[c4d.DOCUMENT_MINTIME].GetFrame(fps), doc[c4d.DOCUMENT_MAXTIME].GetFrame(fps)
-            return (current_in, current_out)
-        elif operation == "set_frame_range":
-            # Set Project MIN/MAX Time
-            if head_in_frame:
-                # Set Handles if exists
-                doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(head_in_frame, fps)
-            else:
-                doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(in_frame, fps)
-            
-            if tail_out_frame:
-                # Set Handles if exists
-                doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(tail_out_frame, fps)
-            else:
-                doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(out_frame, fps)
+    def set_frame_range(self, in_frame=None, out_frame=None, **kwargs):
+        """
+        set_frame_range will set the frame range using `in_frame` and `out_frame`
+        :param int in_frame: in_frame for the current context
+            (e.g. the current shot, current asset etc)
+        :param int out_frame: out_frame for the current context
+            (e.g. the current shot, current asset etc)
+        """
 
-            # Set Project Preview MIN/MAX Time
-            doc[c4d.DOCUMENT_LOOPMINTIME] = c4d.BaseTime(in_frame, fps)
-            doc[c4d.DOCUMENT_LOOPMAXTIME] = c4d.BaseTime(out_frame, fps)
-            
-            doc[c4d.DOCUMENT_LOOPMINTIME] = c4d.BaseTime(in_frame, fps)
-            return True
+        doc = c4d.documents.GetActiveDocument()
+        fps = doc[c4d.DOCUMENT_FPS]
+        head_in_frame = kwargs.get('head_in_frame')
+        tail_out_frame = kwargs.get('tail_out_frame')
+
+        if head_in_frame:
+            # Set Handles if exists
+            doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(head_in_frame, fps)
+        else:
+            doc[c4d.DOCUMENT_MINTIME] = c4d.BaseTime(in_frame, fps)
+
+        if tail_out_frame:
+            # Set Handles if exists
+            doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(tail_out_frame, fps)
+        else:
+            doc[c4d.DOCUMENT_MAXTIME] = c4d.BaseTime(out_frame, fps)
+
+        # Set Project Preview MIN/MAX Time
+        doc[c4d.DOCUMENT_LOOPMINTIME] = c4d.BaseTime(in_frame, fps)
+        doc[c4d.DOCUMENT_LOOPMAXTIME] = c4d.BaseTime(out_frame, fps)
+
+        doc[c4d.DOCUMENT_LOOPMINTIME] = c4d.BaseTime(in_frame, fps)
+        return True
