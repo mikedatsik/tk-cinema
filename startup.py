@@ -66,6 +66,15 @@ class CinemaLauncher(SoftwareLauncher):
             "g_additionalModulePath"
         ]
 
+        if 'R23' in exec_path:
+            # Get Qt Site - when launching from Shotgun Desktop this should
+            # point to the installs lib/site-packages directory.
+            try:
+                from sgtk.platform.qt import QtCore
+                qt_site = os.path.dirname(os.path.dirname(QtCore.__file__))
+                sgtk.util.append_path_to_env_var("PYTHONPATH", qt_site)
+            except ImportError:
+                pass
 
         sgtk.util.append_path_to_env_var(
             "PYTHONPATH", os.path.join(startup_path, 'libs')
