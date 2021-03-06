@@ -9,30 +9,31 @@ import hashlib
 
 import sgtk
 
+import sgtk
 import tank
 
 
 # Need to find better Solution with dinamic menu
-menu_prebuild = [   ['File Save...', '1825592'],
-                    ['File Open...', '1760964'],
-                    ['Snapshot...', '2436236'],
-                    ['Jump to Shotgun', '2701393'],
-                    ['Jump to File System', '2158662'],
-                    ['Jump to Screening Room in RV', '2188709'],
-                    ['Jump to Screening Room Web Player', '2419038'],
-                    ['Open Log Folder', '3271712'],
-                    ['Scene Breakdown...', '1506973'],
-                    ['Load...', '3279052'],
-                    ['Reload and Restart', '5919542'],
-                    ['Work Area Info...', '2574358'],
-                    ['Shotgun Panel...', '2399777'],
-                    ['Publish...', '3378887'],
-                    ['Sync Frame Range with Shotgun', '3366874'],
-                    ['Snapshot History...', '3313077'],
-                    ]
+menu_prebuild = [
+    ['File Save...', '1825592'],
+    ['File Open...', '1760964'],
+    ['Snapshot...', '2436236'],
+    ['Jump to Shotgun', '2701393'],
+    ['Jump to File System', '2158662'],
+    ['Jump to Screening Room in RV', '2188709'],
+    ['Jump to Screening Room Web Player', '2419038'],
+    ['Open Log Folder', '3271712'],
+    ['Scene Breakdown...', '1506973'],
+    ['Load...', '3279052'],
+    ['Reload and Restart', '5919542'],
+    ['Work Area Info...', '2574358'],
+    ['Shotgun Panel...', '2399777'],
+    ['Publish...', '3378887'],
+    ['Sync Frame Range with Shotgun', '3366874'],
+    ['Snapshot History...', '3313077'],
+]
 
 logger = sgtk.LogManager.get_logger(__name__)
-
 logger.debug("Launching toolkit in classic mode.")
 env_engine = os.environ.get("SGTK_ENGINE")
 env_context = os.environ.get("SGTK_CONTEXT")
@@ -40,10 +41,17 @@ context = sgtk.context.deserialize(env_context)
 
 try:
     engine = sgtk.platform.start_engine(env_engine, context.sgtk, context)
-except:
+except Exception:
+    logger.error('Error starting engine...')
+    traceback.print_exc()
+
+    logger.debug('Attempting to use Current Engine...')
     engine = tank.platform.engine.current_engine()
 
-
+if engine is None:
+    raise RuntimeError(
+        'Failed to load tk-cinema! Can not start or find engine.'
+    )
 
 def get_plugins():
     out = []
