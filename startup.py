@@ -146,7 +146,7 @@ class CinemaLauncher(SoftwareLauncher):
                 # in the case of version we return something different than
                 # an empty string because there are cases were the installation
                 # directories do not include version number information.
-                executable_version = key_dict.get("version", " ")
+                executable_version = key_dict.get("version", " ").lstrip('R')
 
                 sw_versions.append(
                     SoftwareVersion(
