@@ -52,21 +52,26 @@ class CinemaLauncher(SoftwareLauncher):
                                  launch.
         :returns: :class:`LaunchInformation` instance
         """
+
         required_env = {}
 
         # Run the engine's userSetup.py file when Cinema starts up
         # by appending it to the env PYTHONPATH.
         startup_path = os.path.join(self.disk_location, "startup")
-        
+
         sgtk.util.append_path_to_env_var(
             "g_additionalModulePath", startup_path
         )
-        sgtk.util.append_path_to_env_var(
-            "PYTHONPATH", os.path.join(startup_path, 'libs')
-        )        
         required_env["g_additionalModulePath"] = os.environ[
             "g_additionalModulePath"
         ]
+
+
+        sgtk.util.append_path_to_env_var(
+            "PYTHONPATH", os.path.join(startup_path, 'libs')
+        )
+        required_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
+        required_env["C4DPYTHONPATH37"] = os.environ["PYTHONPATH"]
 
         # Prepare the launch environment with variables required by the
         # classic bootstrap approach.
