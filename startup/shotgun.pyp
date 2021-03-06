@@ -6,8 +6,15 @@ import sys
 import c4d
 import signal
 import hashlib
+import traceback
 
-import sgtk
+# Patch: Append to sys.path for early builds of R23
+if 23000 < c4d.GetC4DVersion() < 23105:
+    python_path = os.environ['PYTHONPATH'].replace("\\", "/").split(os.pathsep)
+    for entry in python_path:
+        if entry not in sys.path:
+            sys.path.append(entry)
+
 
 import sgtk
 import tank
