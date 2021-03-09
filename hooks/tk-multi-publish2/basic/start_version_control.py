@@ -75,7 +75,7 @@ class CinemaStartVersionControlPlugin(HookBaseClass):
         List of item types that this plugin is interested in.
 
         Only items matching entries in this list will be presented to the
-        accept() method. Strings can contain glob patters such as *, for 
+        accept() method. Strings can contain glob patters such as *, for
         example ["cinema.*", "file.cinema"]
         """
         return ["cinema.session"]
@@ -120,7 +120,7 @@ class CinemaStartVersionControlPlugin(HookBaseClass):
                 it will be unchecked. Optional, True by default.
 
         :param settings: Dictionary of Settings. The keys are strings, matching
-                         the keys returned in the settings property. 
+                         the keys returned in the settings property.
                          The values are `Setting` instances.
         :param item: Item to process
 
@@ -166,7 +166,7 @@ class CinemaStartVersionControlPlugin(HookBaseClass):
         Returns a boolean to indicate validity.
 
         :param settings: Dictionary of Settings. The keys are strings, matching
-                         the keys returned in the settings property. 
+                         the keys returned in the settings property.
                          The values are `Setting` instances.
         :param item: Item to process
 
@@ -206,7 +206,7 @@ class CinemaStartVersionControlPlugin(HookBaseClass):
         Executes the publish logic for the given item and settings.
 
         :param settings: Dictionary of Settings. The keys are strings, matching
-                         the keys returned in the settings property. 
+                         the keys returned in the settings property.
                          The values are `Setting` instances.
         :param item: Item to process
         """
@@ -237,7 +237,7 @@ class CinemaStartVersionControlPlugin(HookBaseClass):
         be used to version up files.
 
         :param settings: Dictionary of Settings. The keys are strings, matching
-                         the keys returned in the settings property. 
+                         the keys returned in the settings property.
                          The values are `Setting` instances.
         :param item: Item to process
         """
@@ -292,10 +292,6 @@ def _session_path():
     :return:
     """
     path = c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
-
-    if isinstance(path, unicode):
-        path = path.encode("utf-8")
-
     return path
 
 

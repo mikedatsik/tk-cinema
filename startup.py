@@ -52,21 +52,35 @@ class CinemaLauncher(SoftwareLauncher):
                                  launch.
         :returns: :class:`LaunchInformation` instance
         """
+
         required_env = {}
 
         # Run the engine's userSetup.py file when Cinema starts up
         # by appending it to the env PYTHONPATH.
         startup_path = os.path.join(self.disk_location, "startup")
-        
+
         sgtk.util.append_path_to_env_var(
             "g_additionalModulePath", startup_path
         )
-        sgtk.util.append_path_to_env_var(
-            "PYTHONPATH", os.path.join(startup_path, 'libs')
-        )        
         required_env["g_additionalModulePath"] = os.environ[
             "g_additionalModulePath"
         ]
+
+        if 'R23' in exec_path:
+            # Get Qt Site - when launching from Shotgun Desktop this should
+            # point to the installs lib/site-packages directory.
+            try:
+                from sgtk.platform.qt import QtCore
+                qt_site = os.path.dirname(os.path.dirname(QtCore.__file__))
+                sgtk.util.append_path_to_env_var("PYTHONPATH", qt_site)
+            except ImportError:
+                pass
+
+        sgtk.util.append_path_to_env_var(
+            "PYTHONPATH", os.path.join(startup_path, 'libs')
+        )
+        required_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
+        required_env["C4DPYTHONPATH37"] = os.environ["PYTHONPATH"]
 
         # Prepare the launch environment with variables required by the
         # classic bootstrap approach.
@@ -146,7 +160,7 @@ class CinemaLauncher(SoftwareLauncher):
                 # in the case of version we return something different than
                 # an empty string because there are cases were the installation
                 # directories do not include version number information.
-                executable_version = key_dict.get("version", " ")
+                executable_version = key_dict.get("version", " ").lstrip('R')
 
                 sw_versions.append(
                     SoftwareVersion(

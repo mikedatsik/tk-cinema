@@ -141,7 +141,7 @@ class CinemaSessionPublishPlugin(HookBaseClass):
         List of item types that this plugin is interested in.
 
         Only items matching entries in this list will be presented to the
-        accept() method. Strings can contain glob patters such as *, for 
+        accept() method. Strings can contain glob patters such as *, for
         example ["cinema.*", "file.cinema"]
         """
         return ["cinema.session"]
@@ -149,7 +149,7 @@ class CinemaSessionPublishPlugin(HookBaseClass):
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any
-        interest to this plugin. Only items matching the filters defined via 
+        interest to this plugin. Only items matching the filters defined via
         the item_filters property will be presented to this method.
 
         A publish task will be generated for each item accepted here. Returns a
@@ -201,7 +201,7 @@ class CinemaSessionPublishPlugin(HookBaseClass):
         boolean to indicate validity.
 
         :param settings: Dictionary of Settings. The keys are strings, matching
-                         the keys returned in the settings property. The values 
+                         the keys returned in the settings property. The values
                          are `Setting` instances.
         :param item: Item to process
         :returns: True if item is valid, False otherwise.
@@ -347,12 +347,7 @@ def _session_path():
     Return the path to the current session
     :return:
     """
-    path = c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
-
-    if isinstance(path, unicode):
-        path = path.encode("utf-8")
-
-    return path
+    return c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
 
 
 def _save_session(path):
