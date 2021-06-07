@@ -80,7 +80,8 @@ class CinemaLauncher(SoftwareLauncher):
             "PYTHONPATH", os.path.join(startup_path, 'libs')
         )
         required_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
-        required_env["C4DPYTHONPATH37"] = os.environ["PYTHONPATH"]
+        required_env["C4DPYTHONPATH37"] = os.environ["PYTHONPATH"]  # R23
+        required_env["C4DPYTHONPATH39"] = os.environ["PYTHONPATH"]  # R24
 
         # Prepare the launch environment with variables required by the
         # classic bootstrap approach.
