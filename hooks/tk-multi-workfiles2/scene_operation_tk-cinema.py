@@ -96,10 +96,14 @@ class SceneOperation(HookClass):
         elif operation == "open":
             c4d.documents.LoadFile(file_path)
         elif operation == "save":
-            c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
-            c4d.documents.LoadFile(file_path)
+			split = file_path.split("\\")
+			doc.SetDocumentName(split[-1])
+			doc.SetDocumentPath("\\".join(split[:-1]))
+			c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
         elif operation == "save_as":
-            c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
-            c4d.documents.LoadFile(file_path)
+			split = file_path.split("\\")
+			doc.SetDocumentName(split[-1])
+			doc.SetDocumentPath("\\".join(split[:-1]))
+			c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
         elif operation == "reset":
             return True

@@ -168,7 +168,7 @@ def EnhanceMainMenu():
 def PluginMessage(id, data):
     if id==c4d.C4DPL_BUILDMENU:
         EnhanceMainMenu()
-    if id==c4d.C4DPL_ENDPROGRAM:
+    if id==c4d.C4DPL_ENDACTIVITY:
         # Close Cinema Solution after PySide executes
         os.kill(os.getpid(), signal.SIGTERM)
 

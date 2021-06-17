@@ -360,8 +360,11 @@ def _save_session(path):
     ensure_folder_exists(folder)
 
     doc = c4d.documents.GetActiveDocument()
-    c4d.documents.SaveDocument(doc, str(path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
-    c4d.documents.LoadFile(path)
+
+	split = path.split("\\")
+	doc.SetDocumentName(split[-1])
+	doc.SetDocumentPath("\\".join(split[:-1]))
+	c4d.documents.SaveDocument(doc, str(path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
 
 
 # TODO: method duplicated in all the cinema hooks
