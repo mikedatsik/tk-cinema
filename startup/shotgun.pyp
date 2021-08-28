@@ -40,7 +40,7 @@ menu_prebuild = [
     ['Snapshot History...', '3313077'],
 ]
 
-logger = sgtk.LogManager.get_logger(__name__)
+logger = sgtk.LogManager.get_logger('shotgun.pyp')
 logger.debug("Launching toolkit in classic mode.")
 env_engine = os.environ.get("SGTK_ENGINE")
 env_context = os.environ.get("SGTK_CONTEXT")
