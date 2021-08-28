@@ -135,13 +135,24 @@ class SceneChangeEvent(c4d.plugins.MessageData):
         if id == c4d.EVMSG_CHANGE:
             new_document = c4d.documents.GetActiveDocument()[c4d.DOCUMENT_FILEPATH]
             if new_document != self.document:
-                if "Untitled " not in new_document:
-                    self.document = new_document
-                    try:
-                        ctx = engine.get_document_context(self.document)
-                        engine.change_context(ctx)
-                    except tank.TankError as e:
-                        logger.exception("Could not execute tank_from_path('%s')" % self.document)
+                self.document = new_document
+
+                try:
+                    ctx = engine.get_document_context(self.document)
+                except Exception as e:
+                    logger.debug((
+                        'Could not determine context from "%s"'
+                    )% (self.document, str(e)))
+                    return True
+
+                try:
+                    engine.change_context(ctx)
+                except Exception as e:
+                    logger.debug((
+                        'Could not set context for "%s"\n'
+                        'context: %s\n'
+                        'error: %s\n'
+                    ) % (self.document, ctx, str(e)))
         return True
 
 
