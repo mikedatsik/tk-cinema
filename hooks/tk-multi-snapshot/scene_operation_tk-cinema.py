@@ -52,7 +52,7 @@ class SceneOperation(Hook):
         elif operation == "save":
             current_project = doc[c4d.DOCUMENT_FILEPATH]
 
-			split = file_path.split("\\")
-			doc.SetDocumentName(split[-1])
-			doc.SetDocumentPath("\\".join(split[:-1]))
-			c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
+            folder, file = os.path.split(file_path)
+            doc.SetDocumentName(file)
+            doc.SetDocumentPath(folder)
+            c4d.documents.SaveDocument(doc, file_path, c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
