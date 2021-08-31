@@ -686,9 +686,9 @@ class CinemaEngine(Engine):
 
         self._init_shotgun_cache()
 
-        doc_path = doc_path.replace('\\', '/').lower()
-        if doc_path in c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP']:
-            return c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP'][doc_path]
+        cache_key = doc_path.replace('\\', '/').lower()
+        if cache_key in c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP']:
+            return c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP'][cache_key]
         else:
             return self.sgtk.context_from_path(doc_path)
 
@@ -697,5 +697,5 @@ class CinemaEngine(Engine):
 
         self._init_shotgun_cache()
 
-        doc_path = doc_path.replace('\\', '/').lower()
-        c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP'][doc_path] = context
+        cache_key = doc_path.replace('\\', '/').lower()
+        c4d._shotgun_cache['DOCUMENT_CONTEXT_MAP'][cache_key] = context

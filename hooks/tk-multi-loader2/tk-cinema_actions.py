@@ -9,7 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 """
-Hook that loads defines all the available actions, broken down by publish type. 
+Hook that loads defines all the available actions, broken down by publish type.
 """
 
 import os
@@ -61,9 +61,9 @@ class CinemaActions(HookBaseClass):
         - If it will be shown in the details area, "details" is passed.
         - If it will be shown in the history area, "history" is passed.
 
-        Please note that it is perfectly possible to create more than one 
+        Please note that it is perfectly possible to create more than one
         action "instance" for an action!
-        You can for example do scene introspectionvif the action passed in 
+        You can for example do scene introspectionvif the action passed in
         is "character_attachment" you may for examplevscan the scene, figure
         out all the nodes where this object can bevattached and return a list
         of action instances: "attach to left hand",v"attach to right hand" etc.
@@ -71,11 +71,11 @@ class CinemaActions(HookBaseClass):
         the params key to pass additional data into the run_action hook.
 
         :param sg_publish_data: Shotgun data dictionary with all the standard
-                                publish fields. 
+                                publish fields.
         :param actions: List of action strings which have been
-                        defined in the app configuration. 
+                        defined in the app configuration.
         :param ui_area: String denoting the UI Area (see above).
-        :returns List of dictionaries, each with keys name, params, caption 
+        :returns List of dictionaries, each with keys name, params, caption
          and description
         """
 
@@ -144,7 +144,7 @@ class CinemaActions(HookBaseClass):
             params: Parameters passed down from the generate_actions hook.
 
         .. note::
-            This is the default entry point for the hook. It reuses the 
+            This is the default entry point for the hook. It reuses the
             ``execute_action`` method for backward compatibility with hooks
              written for the previous version of the loader.
 
@@ -167,7 +167,7 @@ class CinemaActions(HookBaseClass):
         """
         Execute a given action. The data sent to this be method will
         represent one of the actions enumerated by the generate_actions method.
-        
+
         :param name: Action name string representing one of the items returned
                      by generate_actions.
         :param params: Params data, as specified by generate_actions.
@@ -204,7 +204,7 @@ class CinemaActions(HookBaseClass):
         """
         Create a reference with the same settings Cinema would use
         if you used the create settings dialog.
-        
+
         :param path: Path to file.
         :param sg_publish_data: Shotgun data dictionary with all the standard
                                 publish fields.
@@ -214,9 +214,9 @@ class CinemaActions(HookBaseClass):
 
         namespace = "%s %s" % (sg_publish_data.get("entity").get("name"), sg_publish_data.get("name"))
         namespace = namespace.replace(" ", "_")
-        
+
         doc = c4d.documents.GetActiveDocument()
-        
+
         xref = c4d.BaseObject(c4d.Oxref)
         doc.InsertObject(xref)
         xref.SetParameter(c4d.ID_CA_XREF_FILE, path, c4d.DESCFLAGS_SET_USERINTERACTION)
@@ -228,28 +228,34 @@ class CinemaActions(HookBaseClass):
         """
         Create a reference with the same settings Cinema would use
         if you used the create settings dialog.
-        
+
         :param path: Path to file.
         :param sg_publish_data: Shotgun data dictionary with all the standard
                                 publish fields.
         """
         doc = c4d.documents.GetActiveDocument()
-        
+
         if not os.path.exists(path):
             raise TankError("File not found on disk - '%s'" % path)
 
-        import_project_extensions = (".c4d")
-
+        import_project_extensions = (".c4d",)
         _, extension = os.path.splitext(path)
-
         if extension.lower() in import_project_extensions:
-            c4d.documents.MergeDocument(doc, path, 0)
+            c4d.documents.MergeDocument(
+                doc,
+                path,
+                (
+                    c4d.SCENEFILTER_OBJECTS |
+                    c4d.SCENEFILTER_MATERIALS |
+                    c4d.SCENEFILTER_MERGESCENE
+                ),
+            )
             c4d.EventAdd()
 
     def _create_texture_node(self, path, sg_publish_data):
         """
         Create a file texture node for a texture
-        
+
         :param path:             Path to file.
         :param sg_publish_data:  Shotgun data dictionary with all the standard
                                  publish fields.
@@ -257,10 +263,10 @@ class CinemaActions(HookBaseClass):
         """
 
         doc = c4d.documents.GetActiveDocument()
-        
+
         file_node = c4d.BaseList2D(c4d.Xbitmap)
         file_node[c4d.BITMAPSHADER_FILENAME] = path
         doc.InsertShader(file_node)
         c4d.EventAdd()
-        
+
         return file_node

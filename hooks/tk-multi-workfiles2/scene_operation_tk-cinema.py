@@ -85,7 +85,7 @@ class SceneOperation(HookClass):
 
         doc = c4d.documents.GetActiveDocument()
 
-        if operation in ['open', 'save', 'save_as']:
+        if operation in ('open', 'save', 'save_as'):
             # Store the full Shotgun Context for the given file_path
             # This will be used by shotgun.pyp to ensure the correct
             # context is set when the c4d document is changed.
@@ -95,15 +95,35 @@ class SceneOperation(HookClass):
             return doc[c4d.DOCUMENT_FILEPATH]
         elif operation == "open":
             c4d.documents.LoadFile(file_path)
-        elif operation == "save":
-			split = file_path.split("\\")
-			doc.SetDocumentName(split[-1])
-			doc.SetDocumentPath("\\".join(split[:-1]))
-			c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
-        elif operation == "save_as":
-			split = file_path.split("\\")
-			doc.SetDocumentName(split[-1])
-			doc.SetDocumentPath("\\".join(split[:-1]))
-			c4d.documents.SaveDocument(doc, str(file_path), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
+        elif operation in ("save", "save_as"):
+            folder, file = os.path.split(file_path)
+            doc.SetDocumentName(file)
+            doc.SetDocumentPath(folder)
+            c4d.documents.SaveDocument(doc, file_path, c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
         elif operation == "reset":
+            if doc.GetChanged():
+                response = c4d.gui.QuestionDialog(
+                    'The active document has unsaved changes.\n'
+                    'Would you like to save?'
+                )
+                if response:
+                    active_name = doc.GetDocumentName()
+                    active_path = doc.GetDocumentPath()
+                    active_file_path = os.path.join(active_path, active_name)
+                    c4d.documents.SaveDocument(
+                        doc,
+                        active_file_path or '',
+                        (
+                            c4d.SAVEDOCUMENTFLAGS_SAVEAS,
+                            c4d.SAVEDOCUMENTFLAGS_NONE
+                        )[bool(active_file_path)],
+                        c4d.FORMAT_C4DEXPORT,
+                    )
+
+            new_doc = c4d.documents.BaseDocument()
+            c4d.documents.InsertBaseDocument(new_doc)
+            c4d.documents.SetActiveDocument(new_doc)
+
+            # Store full Shotgun Context context for new untitled document.
+            engine.set_document_context(new_doc[c4d.DOCUMENT_FILEPATH], context)
             return True
