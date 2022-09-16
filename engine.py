@@ -382,10 +382,10 @@ class CinemaEngine(Engine):
             qt_app = QtGui.QApplication([])
             qt_app.setWindowIcon(QtGui.QIcon(self.icon_256))
             qt_app.setQuitOnLastWindowClosed(False)
-
-            # set up the dark style
-            self._initialize_dark_look_and_feel()
             qt_app.aboutToQuit.connect(qt_app.deleteLater)
+
+        # set up the dark style
+        self._initialize_dark_look_and_feel()
 
     def post_app_init(self):
         """
