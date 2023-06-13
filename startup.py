@@ -20,18 +20,18 @@ class CinemaLauncher(SoftwareLauncher):
     # matching against supplied versions and products. Similar to the glob
     # strings, these allow us to alter the regex matching for any of the
     # variable components of the path in one place
-    COMPONENT_REGEX_LOOKUP = {"version": r"R\d\d|\d\d\d\d"}
+    COMPONENT_REGEX_LOOKUP = {"version": r"R\d\d|\d\d\d\d|\d\d\d\d\.\d"}
 
     EXECUTABLE_TEMPLATES = {
         "darwin": [
             "/Applications/MAXON/Cinema 4D {version}/CINEMA 4D.app",
-            "$CINEMA_BIN_DIR/CINEMA 4D.app"
+            "$CINEMA_BIN_DIR/CINEMA 4D.app",
         ],
         "win32": [
             "C:/Program Files/MAXON/Cinema 4D {version}/CINEMA 4D.exe",
             "C:/Program Files/MAXON Cinema 4D {version}/CINEMA 4D.exe",
-            "$CINEMA_BIN_DIR/CINEMA 4D.exe"
-        ]
+            "$CINEMA_BIN_DIR/CINEMA 4D.exe",
+        ],
     }
 
     @property
@@ -59,35 +59,31 @@ class CinemaLauncher(SoftwareLauncher):
         # by appending it to the env PYTHONPATH.
         startup_path = os.path.join(self.disk_location, "startup")
 
-        sgtk.util.append_path_to_env_var(
-            "g_additionalModulePath", startup_path
-        )
-        required_env["g_additionalModulePath"] = os.environ[
-            "g_additionalModulePath"
-        ]
+        sgtk.util.append_path_to_env_var("g_additionalModulePath", startup_path)
+        required_env["g_additionalModulePath"] = os.environ["g_additionalModulePath"]
 
-        if 'R23' in exec_path:
+        if "R23" in exec_path:
             # Get Qt Site - when launching from Shotgun Desktop this should
             # point to the installs lib/site-packages directory.
             try:
                 from sgtk.platform.qt import QtCore
+
                 qt_site = os.path.dirname(os.path.dirname(QtCore.__file__))
                 sgtk.util.append_path_to_env_var("PYTHONPATH", qt_site)
             except ImportError:
                 pass
 
         sgtk.util.append_path_to_env_var(
-            "PYTHONPATH", os.path.join(startup_path, 'libs')
+            "PYTHONPATH", os.path.join(startup_path, "libs")
         )
         required_env["PYTHONPATH"] = os.environ["PYTHONPATH"]
         required_env["C4DPYTHONPATH37"] = os.environ["PYTHONPATH"]  # R23
-        required_env["C4DPYTHONPATH39"] = os.environ["PYTHONPATH"]  # R24
+        required_env["C4DPYTHONPATH39"] = os.environ["PYTHONPATH"]  # R24-2023.1
+        required_env["C4DPYTHONPATH310"] = os.environ["PYTHONPATH"]  # 2023.2
 
         # Prepare the launch environment with variables required by the
         # classic bootstrap approach.
-        self.logger.debug(
-            "Preparing Cinema Launch via Toolkit Classic methodology ..."
-        )
+        self.logger.debug("Preparing Cinema Launch via Toolkit Classic methodology ...")
         required_env["SGTK_ENGINE"] = self.engine_name
         required_env["SGTK_CONTEXT"] = sgtk.context.serialize(self.context)
 
@@ -127,8 +123,7 @@ class CinemaLauncher(SoftwareLauncher):
                 supported_sw_versions.append(sw_version)
             else:
                 self.logger.debug(
-                    "SoftwareVersion %s is not supported: %s"
-                    % (sw_version, reason)
+                    "SoftwareVersion %s is not supported: %s" % (sw_version, reason)
                 )
 
         return supported_sw_versions
@@ -155,13 +150,12 @@ class CinemaLauncher(SoftwareLauncher):
             )
 
             # Extract all products from that executable.
-            for (executable_path, key_dict) in executable_matches:
-
+            for executable_path, key_dict in executable_matches:
                 # extract the matched keys form the key_dict.
                 # in the case of version we return something different than
                 # an empty string because there are cases were the installation
                 # directories do not include version number information.
-                executable_version = key_dict.get("version", " ").lstrip('R')
+                executable_version = key_dict.get("version", " ").lstrip("R")
 
                 sw_versions.append(
                     SoftwareVersion(
